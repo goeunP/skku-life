@@ -1,5 +1,5 @@
 import React from "react";
-import profileImg from "/src/assets/logo.png";
+// import profileImg from "/src/assets/logo.png";
 import Header from "../components/common/Header";
 import Nav from "../components/common/Nav";
 import { useLocation } from "react-router-dom";
@@ -9,7 +9,7 @@ import { Avatar } from "@mui/material";
 
 export default function PersonalCertificationPage() {
   const location = useLocation();
-  const { name, id, img, statusColor, date } = location.state;
+  const { name, id, img, statusColor, date, profileImg } = location.state;
 
   const [certification, setCertification] = useState([]);
   const [processedData, setProcessedData] = useState([]);
@@ -39,10 +39,11 @@ export default function PersonalCertificationPage() {
         display: "flex",
         flexDirection: "column",
         width: "100%",
+
         margin: "0",
         marginTop: "120px",
         //alignItems: "center",
-        gap: "10px"
+        gap: "10px",
       }}
     >
       <div style={{ margin: "0" }}>
@@ -58,49 +59,58 @@ export default function PersonalCertificationPage() {
         }}
       >
         <div
-        
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          gap: "10px",
-          margin: "0px"
-        }}>
-        <Avatar
-          src={profileImg}
-          alt="user"
           style={{
-            width: "70px",
-            height: "70px",
-            backgroundColor: "#D9D9D9",
-            margin: 0,
+            display: "flex",
+            flexDirection: "row",
+            width: "100%",
+            gap: "10px",
+            margin: "0px",
           }}
-        />
-        <div style={{ display: "flex",
-                  flexDirection: "column",
-                  gap: "5px",
-                  margin: "auto 0", }}>
-          <div style={{ fontWeight: "bold", margin: "0px" }}>{name}</div>
-          <div>{date}</div>
-        </div>
+        >
+          <Avatar
+            src={profileImg}
+            alt="user"
+            style={{
+              width: "70px",
+              height: "70px",
+              backgroundColor: "#D9D9D9",
+              margin: 0,
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              margin: "auto 0",
+            }}
+          >
+            <div style={{ fontWeight: "bold", margin: "0px" }}>{name}</div>
+            <div>{date}</div>
+          </div>
         </div>
         <div
-        style={{
-          width: "auto",
-          backgroundColor: `${statusColor}`,
-          borderRadius: "20px",
-          display: "flex",
-          padding: "20px",
-          overflow: "hidden",
-        }}
-      >
-        <img
-          src={img}
-          alt="이미지"
-          style={{ maxHeight: "500px", width: "100%", objectFit: "cover", borderRadius: "20px"
-           }}
-        ></img>
-      </div>
+          style={{
+            width: "90%",
+            height: "60vh",
+            backgroundColor: `${statusColor}`,
+            borderRadius: "20px",
+            display: "flex",
+            padding: "20px",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={img}
+            alt="인증 사진을 업로드하세요."
+            style={{
+              maxHeight: "400px",
+              width: "100%",
+              objectFit: "cover",
+              borderRadius: "20px",
+            }}
+          ></img>
+        </div>
       </div>
     </div>
   );

@@ -11,29 +11,44 @@ export default function CertificateMember({
   status,
   id,
   date,
+  profileImg,
 }) {
   const [statusColor, setStatusColor] = useState("#BBD6FF");
   const [cnt, setCnt] = useState(curCnt);
+  const [yes, setYes] = useState(0);
+  const [no, setNo] = useState(0);
   const navigate = useNavigate();
-
+  const [updateStatus, setUpdateStatus] = useState(status);
+  console.log("id", date, id, status);
   useEffect(() => {
-    status === "none"
-      ? setStatusColor("#BBD6FF")
-      : status === "fail"
-      ? setStatusColor("#FFAFB0")
-      : setStatusColor("#C8FFC3");
-  }, [status]);
-  const handleVote = (v) => {
-    setCnt(cnt + 1);
-    if (cnt > totalCnt) {
-      // 실패/성공 결과 띄우기
+    if (updateStatus === "none") {
+      setStatusColor("#BBD6FF");
+    } else if (updateStatus === "fail") {
+      setStatusColor("#FFAFB0");
+    } else if (updateStatus === "success") {
+      setStatusColor("#C8FFC3");
     }
+  }, [updateStatus]);
+
+  const handleVote = (v) => {
+    setCnt((prevCnt) => prevCnt + 1);
     if (v.innerText === "v") {
-      //찬성 투표 post 요청
+      setYes((prevYes) => prevYes + 1);
     } else {
-      //반대 투표 post 요청
+      setNo((prevNo) => prevNo + 1);
     }
   };
+
+  useEffect(() => {
+    if (cnt >= totalCnt) {
+      if (yes > no) {
+        setUpdateStatus("success");
+      } else {
+        setUpdateStatus("fail");
+      }
+    }
+  }, [yes, no, cnt, totalCnt]);
+  const today = new Date().toISOString().split("T")[0];
   return (
     <div
       style={{
@@ -45,7 +60,8 @@ export default function CertificateMember({
         flexDirection: "row",
         gap: "10px",
         padding: "20px",
-        justifyContent: "flex-start"
+        justifyContent: "flex-start",
+        marginTop: "10px",
       }}
       onClick={() => {
         navigate(`${id}`, {
@@ -56,29 +72,29 @@ export default function CertificateMember({
             statusColor: statusColor,
             date: date,
             img: img,
+            profileImg: profileImg,
           },
         });
       }}
     >
       <Avatar
-        src="src/assets/logo.png"
+        src={profileImg || "src/assets/logo.png"}
         alt="user"
         style={{
           width: "80px",
           height: "80px",
           backgroundColor: "#D9D9D9",
-          margin: "0px"
+          margin: "0px",
         }}
-      ></Avatar>
+      />
       <div>
         <div style={{ fontWeight: "bold" }}>{userName}</div>
         <div>
           투표 현황 {cnt}/{totalCnt}
         </div>
       </div>
-      {status === "none" ? (
+      {updateStatus === "none" && date === today ? (
         <div style={{ width: "20%", gap: "10px", display: "flex" }}>
-          {" "}
           <button
             style={{
               width: "30px",
@@ -89,7 +105,6 @@ export default function CertificateMember({
             }}
             onClick={(e) => {
               e.stopPropagation();
-
               handleVote(e.target);
             }}
           >
@@ -105,17 +120,18 @@ export default function CertificateMember({
             }}
             onClick={(e) => {
               e.stopPropagation();
-
               handleVote(e.target);
             }}
           >
             x
           </button>
         </div>
-      ) : status === "fail" ? (
+      ) : updateStatus === "fail" ? (
         <div style={{ width: "20%", textAlign: "center" }}>인증 실패</div>
-      ) : (
+      ) : updateStatus === "success" ? (
         <div style={{ width: "20%", textAlign: "center" }}>인증 성공</div>
+      ) : (
+        <div style={{ width: "20%", textAlign: "center" }}>미인증</div>
       )}
     </div>
   );

@@ -8,10 +8,7 @@ import axios from "axios";
 import Chart from "../components/main/Chart";
 
 export default function GroupMainPage() {
-  const [Profile, setProfile] = useState(DefaultProfile);
   const [statistics, setStatistics] = useState([]);
-  const [groupName, setGroupName] = useState("모임 이름");
-  const [groupIntro, setGroupIntro] = useState("모임 소개문");
   const navigate = useNavigate();
   const [users, setUsers] = useState({
     userClass: [
@@ -131,7 +128,7 @@ export default function GroupMainPage() {
 
             {/* 통계 부분 */}
             <div style={{ width: "100%" }}>
-            <h3 style={{ marginBottom: "5px" }}>통계치</h3>
+              <h3 style={{ marginBottom: "5px" }}>통계치</h3>
               <div
                 style={{
                   backgroundColor: "white",
@@ -159,7 +156,7 @@ export default function GroupMainPage() {
                     style={{ textAlign: "center", width: 85, height: 100 }}
                     onClick={() =>
                       navigate(`/member/${user.userName}`, {
-                        state: { users },
+                        state: { user },
                       })
                     }
                   >
