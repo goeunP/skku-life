@@ -12,14 +12,20 @@ export default function CertificateMember({
   id,
   date,
   profileImg,
+  yesVote,
+  noVote,
+  verificationImage, // verificationImage 추가
 }) {
   const [statusColor, setStatusColor] = useState("#BBD6FF");
   const [cnt, setCnt] = useState(curCnt);
-  const [yes, setYes] = useState(0);
-  const [no, setNo] = useState(0);
+  const [yes, setYes] = useState(yesVote);
+  const [no, setNo] = useState(noVote);
   const navigate = useNavigate();
   const [updateStatus, setUpdateStatus] = useState(status);
-  console.log("id", date, id, status);
+
+  const today = "2024-11-30"; // 오늘 날짜를 11월 30일로 고정
+
+  // 상태에 따른 색상 설정
   useEffect(() => {
     if (updateStatus === "none") {
       setStatusColor("#BBD6FF");
@@ -31,6 +37,7 @@ export default function CertificateMember({
   }, [updateStatus]);
 
   const handleVote = (v) => {
+    // 투표 증가
     setCnt((prevCnt) => prevCnt + 1);
     if (v.innerText === "v") {
       setYes((prevYes) => prevYes + 1);
@@ -40,6 +47,7 @@ export default function CertificateMember({
   };
 
   useEffect(() => {
+    // 투표 상태 업데이트
     if (cnt >= 3) {
       if (yes > 2) {
         setUpdateStatus("success");
@@ -48,7 +56,7 @@ export default function CertificateMember({
       }
     }
   }, [yes, no, cnt, totalCnt]);
-  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div
       style={{
@@ -63,19 +71,6 @@ export default function CertificateMember({
         justifyContent: "flex-start",
         marginTop: "10px",
       }}
-      // onClick={() => {
-      //   navigate(`${id}`, {
-      //     state: {
-      //       name: userName,
-      //       status: status,
-      //       id: id,
-      //       statusColor: statusColor,
-      //       date: date,
-      //       img: img,
-      //       profileImg: profileImg,
-      //     },
-      //   });
-      // }}
     >
       <Avatar
         src={img || "src/assets/logo.png"}
@@ -93,7 +88,12 @@ export default function CertificateMember({
           투표 현황 {cnt}/{totalCnt}
         </div>
       </div>
-      {updateStatus === "none" && date === today ? (
+      {/* verificationImage가 null이면 "인증 업로드 전입니다." 메시지 표시 */}
+      {!img ? (
+        <div style={{ width: "20%", textAlign: "center" }}>
+          인증 업로드 전입니다.
+        </div>
+      ) : updateStatus === "none" && date === today ? (
         <div style={{ width: "20%", gap: "10px", display: "flex" }}>
           <button
             style={{

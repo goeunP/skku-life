@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 export default function CertificateBtn({ classId, onUploadSuccess }) {
-  console.log("classId,", classId, onUploadSuccess);
   const [upload, setUpload] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const inputRef = useRef();
