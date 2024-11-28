@@ -27,14 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Install Headless Chrome
-      - name: Install Chrome
-        run: sudo apt-get install -y chromium-browser
-
-      # Set Chrome path environment variable
-      - name: Set CHROME_PATH
-        run: echo "CHROME_PATH=/usr/bin/chromium-browser" >> $GITHUB_ENV
-
       # Run tests with coverage
       - name: Run tests and generate coverage
         run: npm run test:coverage
