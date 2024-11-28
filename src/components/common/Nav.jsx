@@ -74,8 +74,8 @@ export default function Nav() {
               sx={{ padding: "0", minHeight: "40px", height: "40px" }}
             />
             <Tab
-              component={Link}
-              to="/group-info"
+              component="a"
+              href="/group-info"
               label="모임관리"
               value="4"
               sx={{ padding: "0", minHeight: "40px", height: "40px" }}
@@ -83,11 +83,6 @@ export default function Nav() {
           </TabList>
         </Box>
       </TabContext>
-      {value === '4' && (
-        <Box sx={{ marginTop: "60px" }}> {/* Adjust margin as needed */}
-          <HtmlLoader file={`/html/templates/group-info.html`}/>
-        </Box>
-      )}
     </div>
   );
 }
