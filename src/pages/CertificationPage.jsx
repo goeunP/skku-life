@@ -4,13 +4,14 @@ import CertificateBtn from "../components/certificate/CertificateBtn.jsx";
 import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
-
 export default function CertificationPage() {
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
+  const [userInfo, setUserInfo] = useState([]);
   const today = new Date();
   const formatDate = (date) => date.toISOString().split("T")[0];
-
+  const todayDate = formatDate(today); // 오늘 날짜
+  const [status, setStatus] = useState("none");
   const getDateRange = (days) => {
     const dates = [];
     for (let i = 0; i < days; i++) {
@@ -20,7 +21,70 @@ export default function CertificationPage() {
     }
     return dates;
   };
+  const mergeVerificationData = (dates, classMembers, verifications) => {
+    const verificationMap = verifications.reduce((acc, verification) => {
+      const { userName, verificationDate } = verification;
+      if (!acc[verificationDate]) acc[verificationDate] = {};
+      acc[verificationDate][userName] = verification;
+      return acc;
+    }, {});
+    return dates.map((date) => {
+      if (date === todayDate) {
+        const todayVerifications = verifications.filter(
+          (verification) => verification.verificationDate === todayDate
+        );
+        return { date, verifications: todayVerifications };
+      }
+      const dateVerifications = classMembers.map((member) => {
+        const verification = verificationMap[date]?.[member.userName];
+        if (verification) {
+          return verification;
+        } else {
+          return {
+            createdAt: null,
+            noVote: 0,
+            updatedAt: null,
+            userName: member.userName,
+            verificationDate: date,
+            verificationId: null,
+            verificationImage: null,
+            verificationStatus: 0,
+            yesVote: 0,
+            userImage: member.userImage,
+          };
+        }
+      });
+      return { date, verifications: dateVerifications };
+    });
+  };
 
+  const handleUploadSuccess = (uploadedImage) => {
+    console.log("imggggg", uploadedImage);
+    const currentUserName = userInfo.userName;
+    const updatedCertification = certification.map((day) => {
+      if (day.date === todayDate) {
+        const isUserExist = day.verifications.some(
+          (v) => v.userName === currentUserName
+        );
+        if (!isUserExist) {
+          day.verifications.push({
+            createdAt: new Date().toISOString(),
+            noVote: 0,
+            updatedAt: new Date().toISOString(),
+            userName: currentUserName,
+            verificationDate: todayDate,
+            verificationId: null,
+            verificationImage: uploadedImage,
+            verificationStatus: 0,
+            yesVote: 0,
+            userImage: userInfo.userImage,
+          });
+        }
+      }
+      return day;
+    });
+    setCertification(updatedCertification);
+  };
   const getUserInfo = async () => {
     try {
       const res = await axios.get(
@@ -33,12 +97,11 @@ export default function CertificationPage() {
         }
       );
       setClassInfo(res.data.userClass[0]);
-      console.log("11", res.data.userClass[0]);
+      setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
   };
-
   const getCertification = async () => {
     const dates = getDateRange(5);
     const requests = dates.map((date) =>
@@ -52,20 +115,25 @@ export default function CertificationPage() {
         }
       )
     );
-
     try {
       const responses = await Promise.all(requests);
-      const data = responses.map((res, index) => ({
-        date: dates[index],
-        verifications: res.data.verifications || [],
-      }));
-      setCertification(data);
-      console.log(data);
+      const allVerifications = responses.flatMap((res, index) => {
+        const date = dates[index];
+        return (res.data.verifications || []).map((v) => ({
+          ...v,
+          verificationDate: date,
+        }));
+      });
+      const mergedData = mergeVerificationData(
+        dates,
+        classInfo.classMember,
+        allVerifications
+      );
+      setCertification(mergedData);
     } catch (error) {
       console.error("Error fetching certification data:", error);
     }
   };
-
   useEffect(() => {
     getUserInfo();
   }, []);
@@ -73,9 +141,10 @@ export default function CertificationPage() {
   useEffect(() => {
     if (classInfo) {
       getCertification();
+      console.log(userInfo, "user");
     }
   }, [classInfo]);
-
+  console.log("cccccc", certification);
   return (
     <div
       style={{
@@ -98,34 +167,35 @@ export default function CertificationPage() {
           margin: "0 10px",
         }}
       >
-        <CertificateBtn />
+        <CertificateBtn
+          classId={classInfo.classId}
+          onUploadSuccess={handleUploadSuccess}
+        />
         {certification.map(({ date, verifications }) => (
           <div key={date} style={{ width: "100%" }}>
             <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
               {date}
             </div>
-            {verifications.length > 0 ? (
-              verifications.map((data, index) => (
-                <CertificateMember
-                  key={index}
-                  id={data.verificationId}
-                  date={date}
-                  userName={data.userName}
-                  totalCnt={classInfo.classMember.length}
-                  curCnt={data.yesVote + data.noVote}
-                  status={data.noVote > data.yesVote ? "fail" : "success"}
-                  img={data.verificationImage}
-                />
-              ))
-            ) : (
-              <div
-                style={{
-                  borderTop: "1px solid #ccc",
-                  marginTop: "10px",
-                  paddingTop: "10px",
-                }}
-              ></div>
-            )}
+            {verifications.map((data, index) => (
+              <CertificateMember
+                key={index}
+                id={data.verificationId}
+                date={data.verificationDate}
+                userName={data.userName}
+                totalCnt={classInfo.classMember.length}
+                curCnt={data.yesVote + data.noVote}
+                status={
+                  data.verificationId
+                    ? data.noVote > data.yesVote
+                      ? "fail"
+                      : "success"
+                    : "none"
+                }
+                setStatus={setStatus}
+                profileImg={data.userImage}
+                img={data.verificationImage}
+              />
+            ))}
           </div>
         ))}
       </div>

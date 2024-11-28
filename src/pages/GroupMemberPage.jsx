@@ -8,7 +8,7 @@ import { Avatar } from "@mui/material";
 
 export default function GroupMemberPage() {
   const location = useLocation();
-  const user = location.state.users;
+  const user = location.state.user;
 
   const today = new Date();
 
@@ -84,9 +84,7 @@ export default function GroupMemberPage() {
           margin: "0 10px",
         }}
       >
-        <div
-          style={{ display: "flex", margin: "0", width: "100%" }}
-        >
+        <div style={{ display: "flex", margin: "0", width: "100%" }}>
           <Avatar
             src={user.userImage}
             alt="user"
@@ -97,13 +95,13 @@ export default function GroupMemberPage() {
               marginLeft: "0",
             }}
           ></Avatar>
-          <div style={{ gap: "5px",
-                  margin: "auto 0" }}><h3 style={{ margin: "0" }}>{user.userName}</h3></div>
+          <div style={{ gap: "5px", margin: "auto 0" }}>
+            <h3 style={{ margin: "0" }}>{user.userName}</h3>
+          </div>
         </div>
-        
-        <div style={{ width: "100%" }}>
-        <h3 style={{ marginBottom: "5px" }}>인증 현황</h3>
 
+        <div style={{ width: "100%" }}>
+          <h3 style={{ marginBottom: "5px" }}>인증 현황</h3>
         </div>
 
         {verificationData.map((d) => {
