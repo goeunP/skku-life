@@ -78,7 +78,7 @@ export default function GroupMemberPage() {
   };
 
   const getCertification = async () => {
-    const dates = getDateRange(5);
+    const dates = getDateRange(6);
     const requests = dates.map((date) =>
       axios.get(
         `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/${classId}/${date}`,

@@ -83,19 +83,7 @@ export default function CertificateBtn({ onUploadSuccess }) {
           </button>
         </div>
       ) : (
-        <div>
-          <button
-            style={{
-              backgroundColor: "#919191",
-              width: "100%",
-              height: "15vh",
-              borderRadius: "20px",
-            }}
-            onClick={handleDelete}
-          >
-            다시 업로드 하기
-          </button>
-        </div>
+        null
       )}
     </div>
   );

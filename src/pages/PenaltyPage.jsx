@@ -43,7 +43,7 @@ export default function PenaltyPage() {
     const baseStyle = {
       padding: "10px",
       borderRadius: "20px",
-      marginBottom: "10px",
+      marginBottom: "5px"
     };
 
     switch (type) {
@@ -59,7 +59,6 @@ export default function PenaltyPage() {
           textAlign: "center",
           fontWeight: "bold",
           padding: "20px",
-          margin: "15px 0",
           fontSize: "18px",
         };
       default:
@@ -96,8 +95,8 @@ export default function PenaltyPage() {
     <div
       style={{
         textAlign: "center",
-        margin: "20px 0",
         position: "relative",
+        marginBottom: "20px"
       }}
     >
       <div
@@ -110,7 +109,7 @@ export default function PenaltyPage() {
           color: "#666",
         }}
       >
-        {date}
+        <h3>{date}</h3>
       </div>
     </div>
   );
@@ -210,16 +209,18 @@ export default function PenaltyPage() {
   return (
     <div
       style={{
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
+        gap: "15px",
         margin: "0",
-        padding: "0",
-        boxSizing: "border-box",
-        color: "#333",
-        paddingTop: "120px",
+        marginTop: "120px",
       }}
     >
-      <Header />
-      <Nav />
+      <div style={{ margin: "0" }}>
+        <Header />
+        <Nav />
+      </div>
 
       <div
         style={{
@@ -235,7 +236,7 @@ export default function PenaltyPage() {
             width: "100%",
             maxWidth: "600px",
             boxSizing: "border-box",
-            borderRadius: "20px",
+            
           }}
         >
           {error ? (
@@ -276,8 +277,8 @@ export default function PenaltyPage() {
                     style={{
                       fontSize: "12px",
                       color: "#888",
-                      marginBottom: "10px",
                       textAlign: "left",
+                      marginBottom: '20px'
                     }}
                   >
                     {message.time}
