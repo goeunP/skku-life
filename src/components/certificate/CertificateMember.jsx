@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Avatar } from "@mui/material";
 
 export default function CertificateMember({
@@ -9,21 +8,16 @@ export default function CertificateMember({
   totalCnt,
   curCnt,
   status,
-  id,
   date,
-  profileImg,
   yesVote,
   noVote,
-  verificationImage, // verificationImage 추가
 }) {
   const [statusColor, setStatusColor] = useState("#BBD6FF");
   const [cnt, setCnt] = useState(curCnt);
   const [yes, setYes] = useState(yesVote);
   const [no, setNo] = useState(noVote);
-  const navigate = useNavigate();
   const [updateStatus, setUpdateStatus] = useState(status);
-  console.log(date, userName, yesVote, noVote, status, cnt);
-  const today = "2024-11-30"; // 오늘 날짜를 11월 30일로 고정
+  const today = "2024-11-30";
 
   // 상태에 따른 색상 설정
   useEffect(() => {
@@ -49,7 +43,6 @@ export default function CertificateMember({
   useEffect(() => {
     // 투표 상태 업데이트
     if (cnt >= 3) {
-      console.log("ccsdsdfasdfasd");
       if (yes > 2) {
         setUpdateStatus("success");
       } else if (no > 2) {

@@ -23,8 +23,8 @@ export default function GroupMainPage() {
 
   const [loading, setLoading] = useState(true);
 
-  const classId = sessionStorage.getItem('currentGroup');
-  const token= sessionStorage.getItem('token');
+  const classId = sessionStorage.getItem("currentGroup");
+  const token = sessionStorage.getItem("token");
 
   const getUserInfo = async () => {
     try {
@@ -32,13 +32,11 @@ export default function GroupMainPage() {
         "https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/user/info",
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
       setUsers(res.data);
-      console.log("users", res.data.userClass[0].classMember);
     } catch (error) {
       console.error("Error fetching user info:", error);
     } finally {
@@ -52,8 +50,7 @@ export default function GroupMainPage() {
         `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/class/${classId}/statistics`,
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
