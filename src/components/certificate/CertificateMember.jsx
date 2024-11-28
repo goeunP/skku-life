@@ -22,7 +22,7 @@ export default function CertificateMember({
   const [no, setNo] = useState(noVote);
   const navigate = useNavigate();
   const [updateStatus, setUpdateStatus] = useState(status);
-
+  console.log(date, userName, yesVote, noVote, status, cnt);
   const today = "2024-11-30"; // 오늘 날짜를 11월 30일로 고정
 
   // 상태에 따른 색상 설정
@@ -49,6 +49,7 @@ export default function CertificateMember({
   useEffect(() => {
     // 투표 상태 업데이트
     if (cnt >= 3) {
+      console.log("ccsdsdfasdfasd");
       if (yes > 2) {
         setUpdateStatus("success");
       } else if (no > 2) {
