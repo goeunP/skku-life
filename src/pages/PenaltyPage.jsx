@@ -11,81 +11,21 @@ export default function PenaltyPage() {
   // location을 사용하여 라우트 변경 감지
   const location = useLocation();
 
-  const fetchMessages = async () => {
-    try {
-      const classid = "5a5bbe7d-2744-439b-86d2-e380342d6c91"
-      const response = await fetchWithToken(
-        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/penalty/${classid}/log`
-      );
-      const data = await response.json();
+  // 날짜 범위 생성 함수
+  const generateDateRange = (startDate, endDate) => {
+    const dates = [];
+    const current = new Date(startDate);
+    current.setHours(0, 0, 0, 0); // 시간 초기화
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0); // 시간 초기화
 
-      // 로그가 비어있을 경우 오늘 날짜로 'nopenalty' 메시지 생성
-      if (!data.penaltyLogs || data.penaltyLogs.length === 0) {
-        const today = new Date();
-        setMessages([
-          {
-            date: formatDate(today),
-            time: "00:00",
-            content: "모두가 인증을 완료했습니다",
-            type: "nopenalty",
-            timestamp: today.getTime(),
-          },
-        ]);
-        setError(false);
-        return;
-      }
-
-      // API 응답을 날짜별로 그룹화
-      const messagesByDate = {};
-      data.penaltyLogs.forEach((log) => {
-        const date = new Date(log.alaramDate);
-        const dateStr = formatDate(date);
-
-        if (!messagesByDate[dateStr]) {
-          messagesByDate[dateStr] = [];
-        }
-
-        messagesByDate[dateStr].push({
-          date: dateStr,
-          time: `${String(date.getHours()).padStart(2, "0")}:${String(
-            date.getMinutes()
-          ).padStart(2, "0")}`,
-          content: log.alarmMessage,
-          type: log.alarmType,
-          timestamp: date.getTime(),
-        });
-      });
-
-      // 각 날짜에 대해 벌칙이 없으면 'nopenalty' 메시지 추가
-      const formattedMessages = [];
-      Object.entries(messagesByDate).forEach(([date, messages]) => {
-        if (messages.every((msg) => msg.type !== "penalty")) {
-          formattedMessages.push({
-            date,
-            time: "00:00",
-            content: "모두가 인증을 완료했습니다",
-            type: "nopenalty",
-            timestamp: new Date(date).getTime(),
-          });
-        }
-        formattedMessages.push(...messages);
-      });
-
-      // 타임스탬���로 정렬
-      formattedMessages.sort((a, b) => b.timestamp - a.timestamp);
-
-      setMessages(formattedMessages);
-      setError(false);
-    } catch (error) {
-      console.error("메시지 가져오기 실패:", error);
-      setError(true);
+    while (current <= end) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1); // 하루씩 증가
     }
-  };
 
-  // useEffect의 의존성 배열에 location 추가
-  useEffect(() => {
-    fetchMessages();
-  }, [location]);
+    return dates;
+  };
 
   // 날짜 포맷팅 함수
   const formatDate = (date) => {
@@ -175,6 +115,98 @@ export default function PenaltyPage() {
     </div>
   );
 
+  // fetchMessages 함수
+  const fetchMessages = async () => {
+    try {
+      const classid = "5a5bbe7d-2744-439b-86d2-e380342d6c91";
+      const response = await fetchWithToken(
+        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/penalty/${classid}/log`
+      );
+      const data = await response.json();
+
+      // 로그가 있는지 확인
+      const penaltyLogs = data.penaltyLogs || [];
+
+      // 로그를 날짜별로 그룹화하기 위한 객체 초기화
+      const messagesByDate = {};
+
+      if (penaltyLogs.length > 0) {
+        // 로그를 날짜별로 그룹화
+        penaltyLogs.forEach((log) => {
+          const date = new Date(log.alaramDate);
+          const dateStr = formatDate(date);
+
+          if (!messagesByDate[dateStr]) {
+            messagesByDate[dateStr] = [];
+          }
+
+          messagesByDate[dateStr].push({
+            date: dateStr,
+            time: `${String(date.getHours()).padStart(2, "0")}:${String(
+              date.getMinutes()
+            ).padStart(2, "0")}`,
+            content: log.alarmMessage,
+            type: log.alarmType,
+            timestamp: date.getTime(),
+          });
+        });
+      }
+
+      // 날짜 범위 설정: 가장 이른 로그 날짜부터 어제까지
+      let startDate;
+      if (penaltyLogs.length > 0) {
+        // 가장 이른 로그 날짜 찾기
+        const earliestLogDate = new Date(
+          Math.min(...penaltyLogs.map((log) => new Date(log.alaramDate).getTime()))
+        );
+        startDate = earliestLogDate;
+      } else {
+        // 로그가 없으면 어제 날짜로 설정
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 1);
+      }
+
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1); // 어제 날짜 설정
+
+      const allDates = generateDateRange(startDate, yesterday);
+
+      // 모든 날짜에 대해 로그가 없으면 'nopenalty' 메시지 추가
+      allDates.forEach((date) => {
+        const dateStr = formatDate(date);
+        if (!messagesByDate[dateStr]) {
+          messagesByDate[dateStr] = [
+            {
+              date: dateStr,
+              time: "00:00",
+              content: "모두가 인증을 완료했습니다",
+              type: "nopenalty",
+              timestamp: date.getTime(),
+            },
+          ];
+        }
+      });
+
+      // messagesByDate 객체를 배열로 변환
+      const formattedMessages = Object.values(messagesByDate).flat();
+
+      // 타임스탬프를 기준으로 내림차순 정렬
+      formattedMessages.sort((a, b) => b.timestamp - a.timestamp);
+
+      setMessages(formattedMessages);
+      setError(false);
+    } catch (error) {
+      console.error("메시지 가져오기 실패:", error);
+      setError(true);
+    }
+  };
+
+  // useEffect의 의존성 배열에 location 추가
+  useEffect(() => {
+    fetchMessages();
+  }, [location]);
+
   return (
     <div
       style={{
@@ -196,7 +228,7 @@ export default function PenaltyPage() {
           justifyContent: "center",
           alignItems: "center",
           boxSizing: "border-box",
-          margin: "0px 10px"
+          margin: "0px 10px",
         }}
       >
         <div
@@ -246,8 +278,7 @@ export default function PenaltyPage() {
                       fontSize: "12px",
                       color: "#888",
                       marginBottom: "10px",
-                      textAlign:
-                        message.type === "nopenalty" ? "center" : "left",
+                      textAlign: "left",
                     }}
                   >
                     {message.time}
