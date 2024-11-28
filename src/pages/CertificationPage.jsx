@@ -5,12 +5,13 @@ import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
 export default function CertificationPage() {
-  const token= sessionStorage.getItem('token');
+  const token = sessionStorage.getItem("token");
+
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
-  const today = new Date();
-  today.setDate(today.getDate()+2);
+  const today = new Date(2024, 10, 29);
+  today.setDate(today.getDate() + 2);
   const formatDate = (date) => date.toISOString().split("T")[0];
   const todayDate = formatDate(today); // 오늘 날짜
   const [status, setStatus] = useState("none");
@@ -23,6 +24,7 @@ export default function CertificationPage() {
     }
     return dates;
   };
+
   const mergeVerificationData = (dates, classMembers, verifications) => {
     const verificationMap = verifications.reduce((acc, verification) => {
       const { userName, verificationDate } = verification;
@@ -30,38 +32,30 @@ export default function CertificationPage() {
       acc[verificationDate][userName] = verification;
       return acc;
     }, {});
+
     return dates.map((date) => {
-      if (date === todayDate) {
-        const todayVerifications = verifications.filter(
-          (verification) => verification.verificationDate === todayDate
-        );
-        return { date, verifications: todayVerifications };
-      }
-      const dateVerifications = classMembers.map((member) => {
-        const verification = verificationMap[date]?.[member.userName];
-        if (verification) {
-          return verification;
-        } else {
+      // 해당 날짜에 대해 검증 데이터를 필터링
+      const dateVerifications = classMembers
+        .filter((member) => verificationMap[date]?.[member.userName]) // getCertification 데이터에 없는 멤버 제외
+        .map((member) => {
+          const verification = verificationMap[date]?.[member.userName];
           return {
-            createdAt: null,
-            noVote: 0,
-            updatedAt: null,
-            userName: member.userName,
-            verificationDate: date,
-            verificationId: null,
-            verificationImage: null,
-            verificationStatus: 0,
-            yesVote: 0,
-            userImage: member.userImage,
+            ...verification,
+            status:
+              verification.verificationImage &&
+              verification.yesVote + verification.noVote > 0
+                ? verification.noVote > verification.yesVote
+                  ? "fail"
+                  : "success"
+                : "none",
           };
-        }
-      });
+        });
+
       return { date, verifications: dateVerifications };
     });
   };
 
   const handleUploadSuccess = (uploadedImage) => {
-    console.log("imggggg", uploadedImage);
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -93,8 +87,7 @@ export default function CertificationPage() {
         "https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/user/info",
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -111,8 +104,7 @@ export default function CertificationPage() {
         `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/${classInfo.classId}/${date}`,
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       )
@@ -143,10 +135,8 @@ export default function CertificationPage() {
   useEffect(() => {
     if (classInfo) {
       getCertification();
-      console.log(userInfo, "user");
     }
   }, [classInfo]);
-  console.log("cccccc", certification);
   return (
     <div
       style={{
@@ -187,7 +177,7 @@ export default function CertificationPage() {
                 totalCnt={classInfo.classMember.length}
                 curCnt={data.yesVote + data.noVote}
                 status={
-                  data.verificationId
+                  data.verificationImage && data.noVote + data.yesVote !== 0
                     ? data.noVote > data.yesVote
                       ? "fail"
                       : "success"
@@ -196,6 +186,8 @@ export default function CertificationPage() {
                 setStatus={setStatus}
                 profileImg={data.userImage}
                 img={data.verificationImage}
+                yesVote={data.yesVote}
+                noVote={data.noVote}
               />
             ))}
           </div>
