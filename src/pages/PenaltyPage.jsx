@@ -214,7 +214,6 @@ export default function PenaltyPage() {
         margin: "0",
         padding: "0",
         boxSizing: "border-box",
-        fontFamily: "Arial, sans-serif",
         color: "#333",
         paddingTop: "120px",
       }}
