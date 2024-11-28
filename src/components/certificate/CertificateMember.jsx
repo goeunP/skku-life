@@ -40,13 +40,12 @@ export default function CertificateMember({
   };
 
   useEffect(() => {
-    if (cnt >= totalCnt) {
-      if (yes > no) {
+    if (cnt >= 4) {
+      if (yes > 3) {
         setUpdateStatus("success");
-      } else {
+      } else if (no > 3) {
         setUpdateStatus("fail");
-      }
-    }
+      }}
   }, [yes, no, cnt, totalCnt]);
   const today = new Date().toISOString().split("T")[0];
   return (
