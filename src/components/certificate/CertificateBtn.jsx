@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
-export default function CertificateBtn({ classId, onUploadSuccess }) {
+export default function CertificateBtn({ onUploadSuccess }) {
   const [upload, setUpload] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const inputRef = useRef();
@@ -35,7 +34,6 @@ export default function CertificateBtn({ classId, onUploadSuccess }) {
     }
     const formData = new FormData();
     formData.append("verification", imageFile);
-    console.log("imaasdf", imageFile);
     onUploadSuccess(imageFile.name || null);
     // try {
     //   const response = await axios.post(

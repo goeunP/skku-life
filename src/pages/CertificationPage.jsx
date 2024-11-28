@@ -6,6 +6,7 @@ import Nav from "../components/common/Nav";
 import axios from "axios";
 export default function CertificationPage() {
   const token = sessionStorage.getItem("token");
+
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);

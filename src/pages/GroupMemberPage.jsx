@@ -1,66 +1,124 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Header from "../components/common/Header";
 import Nav from "../components/common/Nav";
-import MainMemberCertificate from "../components/main/MainMemberCertificate";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
 import { Avatar } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+import MainMemberCertificate from "../components/main/MainMemberCertificate";
 
 export default function GroupMemberPage() {
   const location = useLocation();
-  const user = location.state.user;
+  const user = location.state.user; // 현재 유저 정보
+  const classId = sessionStorage.getItem("currentGroup");
+  const token = sessionStorage.getItem("token");
 
-  const today = new Date();
+  const [certification, setCertification] = useState([]); // 인증 데이터
+  const [classInfo, setClassInfo] = useState(""); // 클래스 정보
+  const [userInfo, setUserInfo] = useState([]); // 사용자 정보
+  const today = new Date(2024, 10, 29); // 현재 날짜
+  today.setDate(today.getDate() + 2);
 
-  const formatDate = (date) => {
-    return date.toISOString().split("T")[0];
+  const formatDate = (date) => date.toISOString().split("T")[0]; // 날짜 포맷
+
+  const getDateRange = (days) => {
+    const dates = [];
+    for (let i = 0; i < days; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      dates.push(formatDate(date));
+    }
+    return dates;
   };
 
-  const [verificationData, setVerificationData] = useState([]);
-  const token = sessionStorage.getItem('token');
+  const mergeVerificationData = (dates, classMembers, verifications) => {
+    const verificationMap = verifications.reduce((acc, verification) => {
+      const { userName, verificationDate } = verification;
+      if (!acc[verificationDate]) acc[verificationDate] = {};
+      acc[verificationDate][userName] = verification;
+      return acc;
+    }, {});
 
-  const getUserVerification = async () => {
-    const requests = [];
-    const dateLabels = [];
+    return dates.map((date) => {
+      const dateVerifications = classMembers
+        .filter((member) => verificationMap[date]?.[member.userName]) // getCertification 데이터에 없는 멤버 제외
+        .map((member) => {
+          const verification = verificationMap[date]?.[member.userName];
+          return {
+            ...verification,
+            status:
+              verification.verificationImage &&
+              verification.yesVote + verification.noVote > 0
+                ? verification.noVote > verification.yesVote
+                  ? "fail"
+                  : "success"
+                : "none",
+          };
+        });
 
-    for (let i = 5; i >= 0; i--) {
-      const targetDate = new Date(today);
-      targetDate.setDate(today.getDate() - i);
-      const formattedDate = formatDate(targetDate);
-      const request = axios.get(
-        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/${user.userClass[0].classId}/${formattedDate}`,
+      return { date, verifications: dateVerifications };
+    });
+  };
+
+  const getUserInfo = async () => {
+    try {
+      const res = await axios.get(
+        "https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/user/info",
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      requests.push(request);
-      dateLabels.push(formattedDate);
+      setClassInfo(res.data.userClass[0]);
+      setUserInfo(res.data);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
     }
+  };
+
+  const getCertification = async () => {
+    const dates = getDateRange(5);
+    const requests = dates.map((date) =>
+      axios.get(
+        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/${classId}/${date}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+    );
 
     try {
       const responses = await Promise.all(requests);
-      const validData = responses
-        .map((res, index) => ({
-          date: dateLabels[index],
-          data: res.data,
-        }))
-        .filter(
-          (entry) =>
-            entry.data.verifications && entry.data.verifications.length > 0
-        );
-
-      setVerificationData(validData);
+      const allVerifications = responses.flatMap((res, index) => {
+        const date = dates[index];
+        return (res.data.verifications || []).map((v) => ({
+          ...v,
+          verificationDate: date,
+        }));
+      });
+      const mergedData = mergeVerificationData(
+        dates,
+        classInfo.classMember,
+        allVerifications
+      );
+      setCertification(mergedData);
     } catch (error) {
-      console.error("인증 기록 불러오기 에러:", error);
+      console.error("Error fetching certification data:", error);
     }
   };
 
   useEffect(() => {
-    getUserVerification();
+    getUserInfo();
   }, []);
+
+  useEffect(() => {
+    if (classInfo) {
+      getCertification();
+    }
+  }, [classInfo]);
 
   return (
     <div
@@ -105,14 +163,21 @@ export default function GroupMemberPage() {
           <h3 style={{ marginBottom: "5px" }}>인증 현황</h3>
         </div>
 
-        {verificationData.map((d) => {
+        {/* 각 날짜별 user.userName과 일치하는 데이터만 렌더링 */}
+        {certification.map((d) => {
+          const userVerification = d.verifications.filter(
+            (verification) => verification.userName === user.userName
+          );
+
           return (
-            <MainMemberCertificate
-              key={d.date}
-              date={d.date}
-              image={d.data.verifications[0].verificationImage}
-              status="success"
-            />
+            userVerification.length > 0 && (
+              <MainMemberCertificate
+                key={d.date}
+                date={d.date}
+                image={userVerification[0].verificationImage}
+                status={userVerification[0].status}
+              />
+            )
           );
         })}
       </div>
