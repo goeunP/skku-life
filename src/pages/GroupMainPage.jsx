@@ -23,6 +23,9 @@ export default function GroupMainPage() {
 
   const [loading, setLoading] = useState(true);
 
+  const classId = sessionStorage.getItem('currentGroup');
+  const token= sessionStorage.getItem('token');
+
   const getUserInfo = async () => {
     try {
       const res = await axios.get(
@@ -30,7 +33,7 @@ export default function GroupMainPage() {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjA1OTU5LCJleHAiOjE3NjQxNDE5NTl9.86LBbz7DGZGGlLrJVwNwZmroV6XB_m-BqkPtcbm_z8k",
+              `Bearer ${token}`,
           },
         }
       );
@@ -43,8 +46,6 @@ export default function GroupMainPage() {
     }
   };
 
-  const classId = 1;
-
   const getClassStatistics = async () => {
     try {
       const res = await axios.get(
@@ -52,7 +53,7 @@ export default function GroupMainPage() {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjA1OTU5LCJleHAiOjE3NjQxNDE5NTl9.86LBbz7DGZGGlLrJVwNwZmroV6XB_m-BqkPtcbm_z8k",
+              `Bearer ${token}`,
           },
         }
       );

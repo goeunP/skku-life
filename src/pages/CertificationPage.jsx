@@ -5,10 +5,12 @@ import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
 export default function CertificationPage() {
+  const token= sessionStorage.getItem('token');
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
   const today = new Date();
+  today.setDate(today.getDate()+2);
   const formatDate = (date) => date.toISOString().split("T")[0];
   const todayDate = formatDate(today); // 오늘 날짜
   const [status, setStatus] = useState("none");
@@ -92,7 +94,7 @@ export default function CertificationPage() {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjA1OTU5LCJleHAiOjE3NjQxNDE5NTl9.86LBbz7DGZGGlLrJVwNwZmroV6XB_m-BqkPtcbm_z8k",
+              `Bearer ${token}`,
           },
         }
       );
@@ -110,7 +112,7 @@ export default function CertificationPage() {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjA1OTU5LCJleHAiOjE3NjQxNDE5NTl9.86LBbz7DGZGGlLrJVwNwZmroV6XB_m-BqkPtcbm_z8k",
+              `Bearer ${token}`,
           },
         }
       )

@@ -40,10 +40,10 @@ export default function CertificateMember({
   };
 
   useEffect(() => {
-    if (cnt >= 4) {
-      if (yes > 3) {
+    if (cnt >= 3) {
+      if (yes > 2) {
         setUpdateStatus("success");
-      } else if (no > 3) {
+      } else if (no > 2) {
         setUpdateStatus("fail");
       }
     }
