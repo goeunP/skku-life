@@ -45,7 +45,8 @@ export default function CertificateMember({
         setUpdateStatus("success");
       } else if (no > 3) {
         setUpdateStatus("fail");
-      }}
+      }
+    }
   }, [yes, no, cnt, totalCnt]);
   const today = new Date().toISOString().split("T")[0];
   return (
@@ -62,22 +63,22 @@ export default function CertificateMember({
         justifyContent: "flex-start",
         marginTop: "10px",
       }}
-      onClick={() => {
-        navigate(`${id}`, {
-          state: {
-            name: userName,
-            status: status,
-            id: id,
-            statusColor: statusColor,
-            date: date,
-            img: img,
-            profileImg: profileImg,
-          },
-        });
-      }}
+      // onClick={() => {
+      //   navigate(`${id}`, {
+      //     state: {
+      //       name: userName,
+      //       status: status,
+      //       id: id,
+      //       statusColor: statusColor,
+      //       date: date,
+      //       img: img,
+      //       profileImg: profileImg,
+      //     },
+      //   });
+      // }}
     >
       <Avatar
-        src={profileImg || "src/assets/logo.png"}
+        src={img || "src/assets/logo.png"}
         alt="user"
         style={{
           width: "80px",
