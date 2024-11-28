@@ -6,7 +6,6 @@ import Nav from "../components/common/Nav";
 import axios from "axios";
 export default function CertificationPage() {
   const token = sessionStorage.getItem("token");
-
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
@@ -176,13 +175,7 @@ export default function CertificationPage() {
                 userName={data.userName}
                 totalCnt={classInfo.classMember.length}
                 curCnt={data.yesVote + data.noVote}
-                status={
-                  data.verificationImage && data.noVote + data.yesVote !== 0
-                    ? data.noVote > data.yesVote
-                      ? "fail"
-                      : "success"
-                    : "none"
-                }
+                status={"none"}
                 setStatus={setStatus}
                 profileImg={data.userImage}
                 img={data.verificationImage}
