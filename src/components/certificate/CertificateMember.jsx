@@ -65,7 +65,7 @@ export default function CertificateMember({
         gap: "10px",
         padding: "20px",
         justifyContent: "flex-start",
-        marginTop: "20px"
+       marginBottom: "20px"
       }}
     >
       <Avatar
@@ -89,7 +89,7 @@ export default function CertificateMember({
         <div style={{ width: "20%", textAlign: "center" }}>
           인증 업로드 전입니다.
         </div>
-      ) : updateStatus === "none" && date === today && !voted ? (
+      ) : updateStatus === "none" && date === today && !voted && userName!='최다일' ? (
         <div style={{ width: "120px", gap: "10px", display: "flex", justifyContent: "center" }}>
           <button
             style={{
@@ -128,6 +128,8 @@ export default function CertificateMember({
         <div style={{ width: "120px", textAlign: "center" }}>인증 실패</div>
       ) : updateStatus === "success" ? (
         <div style={{ width: "120px", textAlign: "center" }}>인증 성공</div>
+      ) : userName == "최다일" ? (
+        <div style={{ width: "120px", textAlign: "center" }}>본인 투표</div>
       ) : (
         <div style={{ width: "120px", textAlign: "center" }}>투표 완료</div>
       )}

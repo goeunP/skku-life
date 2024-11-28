@@ -167,8 +167,8 @@ export default function CertificationPage() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
-          margin: "0 10px",
+          marginLeft: "10px",
+          marginRight: "10px",
         }}
       >
         <CertificateBtn
