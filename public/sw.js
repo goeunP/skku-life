@@ -73,7 +73,7 @@ self.addEventListener('fetch', event => {
     const useNetwork = request.headers.get('X-Use-Network') === 'true'; // Force network request
 
     if (useNetwork) {
-        console.log("Removing cached data:", request.url);
+        console.info("Removing cached data:", request.url);
         event.respondWith(
             caches.open(CACHE_NAME)
             .then(cache => cache.delete(request.url))
@@ -85,7 +85,7 @@ self.addEventListener('fetch', event => {
                     return response;
                 })
                 .catch(() => {
-                    console.log('Network request failed');
+                    console.error('Network request failed');
                     return new Response('Network error occurred');
                 })
         );
@@ -97,7 +97,7 @@ self.addEventListener('fetch', event => {
             .then(cached => {
                 if (cached) {
                     // Cache hit - return cached response
-                    console.log('Cache hit:', request.url + '. Put X-Use-Network: true in headers to force network request');
+                    console.debug('Cache hit:', request.url + '. Put X-Use-Network: true in headers to force network request');
                     return cached;
                 }
                 
@@ -111,7 +111,7 @@ self.addEventListener('fetch', event => {
                         return response;
                     })
                     .catch(() => {
-                        console.log('Network request failed, no cache available');
+                        console.error('Network request failed, no cache available');
                         return new Response('Network error occurred');
                     });
             })
