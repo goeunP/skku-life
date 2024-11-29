@@ -28,6 +28,18 @@ export default function GroupMainPage() {
   const classId = sessionStorage.getItem("currentGroup");
   const token = sessionStorage.getItem("token");
 
+  const today = new Date(2024, 10, 29);
+  const formatDate = (date) => date.toISOString().split("T")[0];
+  const getDateRange = (days) => {
+    const dates = [];
+    for (let i = 0; i < days; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      dates.push(formatDate(date));
+    }
+    return dates;
+  };
+
   const getUserInfo = async () => {
     try {
       const res = await axios.get(
@@ -54,6 +66,13 @@ export default function GroupMainPage() {
       });
       const data = await res.json();
       setClassInfo(data[0]);
+
+      // Prefetch rest of the data
+      // Do not use await here to prevent blocking
+      fetchWithToken('class/' + classId + '/statistics');
+      const dates = getDateRange(5);
+      dates.map((date) => fecthWithToken('verification/' + classId + '/' + date));
+      fetchWithToken('/penatly/' + classId + '/log');
     } catch (error) {
       console.error("Error fetching class info:", error);
     }
