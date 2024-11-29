@@ -133,7 +133,9 @@ export default function GroupMainPage() {
                   textAlign: "center",
                 }}
               >
-                <Chart data={statistics} />
+                <Chart data={
+        users?.userClass[0]?.className === "기상스터디" ? [] : statistics
+      } />
               </div>
             </div>
 
