@@ -10,8 +10,9 @@ import MainMemberCertificate from "../components/main/MainMemberCertificate";
 export default function GroupMemberPage() {
   const location = useLocation();
   const user = location.state.user; // 현재 유저 정보
-  const classId = sessionStorage.getItem("currentGroup");
-  const token = sessionStorage.getItem("token");
+  const classId = "581a14a4-f077-44d8-830c-fee0140c2f51";
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaG9pZGFpbEBza2t1LmVkdSIsImlhdCI6MTczMjc5NDQyNCwiZXhwIjoxNzY0MzMwNDI0fQ.Xw_A5Q3N_HnFHnpro6RHFCsx1TJrtXpnwL524VZqXfY";
 
   const [certification, setCertification] = useState([]); // 인증 데이터
   const [classInfo, setClassInfo] = useState(""); // 클래스 정보
@@ -20,6 +21,8 @@ export default function GroupMemberPage() {
   today.setDate(today.getDate() + 2);
 
   const formatDate = (date) => date.toISOString().split("T")[0]; // 날짜 포맷
+  const todayDate = formatDate(today); // 오늘 날짜
+  const [status, setStatus] = useState("none");
 
   const getDateRange = (days) => {
     const dates = [];

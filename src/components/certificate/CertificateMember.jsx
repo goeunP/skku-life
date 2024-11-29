@@ -12,6 +12,7 @@ export default function CertificateMember({
   yesVote,
   noVote,
 }) {
+  console.log("img", img);
   const [statusColor, setStatusColor] = useState("#BBD6FF");
   const [cnt, setCnt] = useState(curCnt);
   const [yes, setYes] = useState(yesVote);
@@ -67,8 +68,7 @@ export default function CertificateMember({
       }}
     >
       <Avatar
-        src={img || "src/assets/logo.png"}
-        alt="user"
+        src={img.slice(0, 5) === "https" ? img : "src/assets/logo.png"}
         style={{
           width: "80px",
           height: "80px",

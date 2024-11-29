@@ -4,9 +4,11 @@ import CertificateBtn from "../components/certificate/CertificateBtn.jsx";
 import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
-export default function CertificationPage() {
-  const token = sessionStorage.getItem("token");
 
+export default function CertificationPage() {
+  //const token = sessionStorage.getItem("token");
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaG9pZGFpbEBza2t1LmVkdSIsImlhdCI6MTczMjc5NDQyNCwiZXhwIjoxNzY0MzMwNDI0fQ.Xw_A5Q3N_HnFHnpro6RHFCsx1TJrtXpnwL524VZqXfY";
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);

@@ -24,7 +24,9 @@ export default function GroupMainPage() {
   const [loading, setLoading] = useState(true);
 
   const classId = sessionStorage.getItem("currentGroup");
-  const token = sessionStorage.getItem("token");
+  //const token= sessionStorage.getItem('token');
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaG9pZGFpbEBza2t1LmVkdSIsImlhdCI6MTczMjc5NDQyNCwiZXhwIjoxNzY0MzMwNDI0fQ.Xw_A5Q3N_HnFHnpro6RHFCsx1TJrtXpnwL524VZqXfY";
 
   const getUserInfo = async () => {
     try {
@@ -37,6 +39,7 @@ export default function GroupMainPage() {
         }
       );
       setUsers(res.data);
+      console.log("users", res.data.userClass[0].classMember);
     } catch (error) {
       console.error("Error fetching user info:", error);
     } finally {
