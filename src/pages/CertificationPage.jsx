@@ -102,7 +102,7 @@ export default function CertificationPage() {
           },
         }
       );
-      setClassInfo(sessionStorage.getItem('currentGroup'));
+      setClassInfo(res.data.userClass[0]);
       setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
