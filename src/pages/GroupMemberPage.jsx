@@ -143,7 +143,7 @@ export default function GroupMemberPage() {
           margin: "0 10px",
         }}
       >
-        <div style={{ display: "flex", margin: "0", width: "100%" }}>
+        <div style={{ display: "flex", margin: "0", width: "100%", }}>
           <Avatar
             src={user.userImage}
             alt="user"
@@ -161,8 +161,6 @@ export default function GroupMemberPage() {
 
         <div style={{ width: "100%" }}>
           <h3 style={{ marginBottom: "5px" }}>인증 현황</h3>
-        </div>
-
         {/* 각 날짜별 user.userName과 일치하는 데이터만 렌더링 */}
         {certification.map((d) => {
           const userVerification = d.verifications.filter(
@@ -180,6 +178,7 @@ export default function GroupMemberPage() {
             )
           );
         })}
+        </div>
       </div>
     </div>
   );

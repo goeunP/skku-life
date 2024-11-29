@@ -76,6 +76,7 @@ export default function CertificateBtn({ onUploadSuccess }) {
               width: "100%",
               height: "120px",
               borderRadius: "20px",
+              marginBottom: "20px"
             }}
             onClick={handleUpload}
           >
