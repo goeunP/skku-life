@@ -7,12 +7,12 @@ import axios from "axios";
 import { fetchWithToken } from "../utils/fetchWithToken.js";
 
 export default function CertificationPage() {
-  //const token = sessionStorage.getItem("token");
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaG9pZGFpbEBza2t1LmVkdSIsImlhdCI6MTczMjc5NDQyNCwiZXhwIjoxNzY0MzMwNDI0fQ.Xw_A5Q3N_HnFHnpro6RHFCsx1TJrtXpnwL524VZqXfY";
+  const token = sessionStorage.getItem("token");
+
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
+  const [isUploaded, setIsUploaded] = useState(false); // 업로드 상태 추가
   const today = new Date(2024, 10, 29);
   today.setDate(today.getDate() + 2);
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -69,7 +69,6 @@ export default function CertificationPage() {
   };
 
   const handleUploadSuccess = (uploadedImage) => {
-    /*
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -94,9 +93,9 @@ export default function CertificationPage() {
       return day;
     });
     setCertification(updatedCertification);
-    */
-    window.location.reload();
+    setIsUploaded(true); // 업로드 성공 시 버튼 숨기기
   };
+
   const getUserInfo = async () => {
     try {
       const res = await axios.get(
@@ -157,6 +156,7 @@ export default function CertificationPage() {
       console.error("Error fetching certification data:", error);
     }
   };
+
   useEffect(() => {
     getUserInfo();
     getClassInfo();
@@ -167,6 +167,7 @@ export default function CertificationPage() {
       getCertification();
     }
   }, [classInfo]);
+
   return (
     <div
       style={{
@@ -190,10 +191,13 @@ export default function CertificationPage() {
           marginRight: "10px",
         }}
       >
-        <CertificateBtn
-          classId={classInfo.classId}
-          onUploadSuccess={handleUploadSuccess}
-        />
+        {/* 업로드 성공 시 버튼 숨기기 */}
+        {!isUploaded && (
+          <CertificateBtn
+            classId={classInfo.classId}
+            onUploadSuccess={handleUploadSuccess}
+          />
+        )}
         {certification.map(({ date, verifications }) => (
           <div key={date} style={{ width: "100%" }}>
             <div style={{ fontWeight: "bold" }}>
@@ -230,7 +234,7 @@ export default function CertificationPage() {
                   status={"none"}
                   setStatus={setStatus}
                   profileImg={data.userImage}
-                  img={data.verificationImae}
+                  img={data.verificationImage}
                   yesVote={data.yesVote}
                   noVote={data.noVote}
                 />
