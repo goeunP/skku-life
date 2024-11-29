@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
+import { fetchWithToken } from "../../utils/fetchWithToken";
 export default function CertificateBtn({ onUploadSuccess }) {
   const [upload, setUpload] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -35,31 +36,33 @@ export default function CertificateBtn({ onUploadSuccess }) {
     const formData = new FormData();
     const classId = sessionStorage.getItem("currentGroup");
     formData.append("classId", classId);
+    //const file = inputRef.current.files[0];
+    //formData.append("verification", file);
     formData.append("verification", imageFile);
-    onUploadSuccess(imageFile.name || null);
-    // try {
-    //   const response = await axios.post(
-    //     "https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/upload",
-    //     { classId: classId, formData: formData }, // FormData를 그대로 전송
-    //     {
-    //       headers: {
-    //         Authorization:
-    //           "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjA1OTU5LCJleHAiOjE3NjQxNDE5NTl9.86LBbz7DGZGGlLrJVwNwZmroV6XB_m-BqkPtcbm_z8k",
-    //         accept: "application/json",
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     }
-    //   );
-    //   console.log("업로드 성공:", response.data);
-    //   alert("이미지가 성공적으로 업로드되었습니다!");
-    //   // 성공한 이미지 URL 등 필요한 정보를 부모로 전달
-    //   if (onUploadSuccess) {
-    //     onUploadSuccess(response.data.imageUrl || null); // 업로드된 이미지 URL을 부모로 전달
-    //   }
-    // } catch (error) {
-    //   console.error("업로드 실패:", error.response?.data || error.message);
-    //   alert("이미지 업로드 중 문제가 발생했습니다.");
-    // }
+
+    console.log("Submitting:", formData);
+
+    //onUploadSuccess(imageFile.name || null);
+    try {
+      const response = await fetchWithToken('/verification/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      console.log("response:", response);
+      const data = await response.json();
+      console.log("data:", data);
+      
+      console.log("업로드 성공:", data);
+      alert("이미지가 성공적으로 업로드되었습니다!");
+      // 성공한 이미지 URL 등 필요한 정보를 부모로 전달
+      if (onUploadSuccess) {
+        onUploadSuccess(data.verifications[0].verificationImage|| null); // 업로드된 이미지 URL을 부모로 전달
+      }
+    } catch (error) {
+      console.error("업로드 실패:", error.response?.data || error.message);
+      alert("이미지 업로드 중 문제가 발생했습니다.");
+    }
   };
   return (
     <div style={{ width: "100%" }}>

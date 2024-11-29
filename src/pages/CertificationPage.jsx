@@ -69,6 +69,7 @@ export default function CertificationPage() {
   };
 
   const handleUploadSuccess = (uploadedImage) => {
+    /*
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -93,6 +94,8 @@ export default function CertificationPage() {
       return day;
     });
     setCertification(updatedCertification);
+    */
+    window.location.reload();
   };
   const getUserInfo = async () => {
     try {
