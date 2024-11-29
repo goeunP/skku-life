@@ -93,6 +93,18 @@ export default function CertificationPage() {
       return day;
     });
     setCertification(updatedCertification);
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const date = `${year}-${month}-${day}`;
+    fetchWithToken(`/verification/${classInfo.classId}/${date}`, {
+      method: "GET",
+      headers: {
+        "X-Use-Network": 'true'
+      }
+  })
     setIsUploaded(true); // 업로드 성공 시 버튼 숨기기
   };
 
@@ -108,7 +120,29 @@ export default function CertificationPage() {
       );
 
       //setClassInfo(res.data.userClass[0]);
-      setUserInfo(res.data);
+      const userData  = res.data;
+      setUserInfo(userData);
+      const classId = sessionStorage.getItem("currentGroup");
+
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const date = `${year}-${month}-${day}`;
+
+      console.log('Verification check -- userdata:', {userData, date});
+
+      const verificationResponse = await fetchWithToken(`/verification/${classId}/${date}`);
+      const verificationData = await verificationResponse.json();
+      console.log('Verification check -- verificationData:', verificationData);
+
+      verificationData.verifications.forEach((v) => {
+        if (userData.userName === v.userName) {
+          console.log("Already uploaded");
+          setIsUploaded(true);
+        }
+      });
+
     } catch (error) {
       console.error("Error fetching user info:", error);
     }

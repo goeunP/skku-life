@@ -69,10 +69,10 @@ export default function GroupMainPage() {
 
       // Prefetch rest of the data
       // Do not use await here to prevent blocking
-      fetchWithToken('class/' + classId + '/statistics');
+      fetchWithToken('/class/' + classId + '/statistics');
       const dates = getDateRange(5);
-      dates.map((date) => fecthWithToken('verification/' + classId + '/' + date));
-      fetchWithToken('/penatly/' + classId + '/log');
+      dates.map((date) => fetchWithToken('/verification/' + classId + '/' + date));
+      fetchWithToken('/penalty/' + classId + '/log');
     } catch (error) {
       console.error("Error fetching class info:", error);
     }
