@@ -4,6 +4,8 @@ import CertificateBtn from "../components/certificate/CertificateBtn.jsx";
 import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
+import { fetchWithToken } from "../utils/fetchWithToken.js";
+
 export default function CertificationPage() {
   const token = sessionStorage.getItem("token");
 
@@ -102,12 +104,25 @@ export default function CertificationPage() {
           },
         }
       );
-      setClassInfo(res.data.userClass[0]);
+
+      //setClassInfo(res.data.userClass[0]);
       setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
   };
+
+  const getClassInfo = async () => {
+    try {
+      let classId = sessionStorage.getItem("currentGroup");
+      const res = await fetchWithToken("/class/" + classId);
+      const data = await res.json();
+      setClassInfo(data[0]);
+    } catch (error) {
+      console.error("Error fetching class info:", error);
+    }
+  }
+
   const getCertification = async () => {
     const dates = getDateRange(5);
     const requests = dates.map((date) =>
@@ -141,6 +156,7 @@ export default function CertificationPage() {
   };
   useEffect(() => {
     getUserInfo();
+    getClassInfo();
   }, []);
 
   useEffect(() => {

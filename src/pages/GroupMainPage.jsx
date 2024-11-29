@@ -6,6 +6,7 @@ import Nav from "../components/common/Nav";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Chart from "../components/main/Chart";
+import { fetchWithToken } from "../utils/fetchWithToken";
 
 export default function GroupMainPage() {
   const [statistics, setStatistics] = useState([]);
@@ -20,6 +21,7 @@ export default function GroupMainPage() {
       },
     ],
   });
+  const [classInfo, setClassInfo] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +46,18 @@ export default function GroupMainPage() {
     }
   };
 
+  const getClassInfo = async () => {
+    try {
+      const res = await fetchWithToken('/class/' + classId, {
+        method: 'GET'
+      });
+      const data = await res.json();
+      setClassInfo(data[0]);
+    } catch (error) {
+      console.error("Error fetching class info:", error);
+    }
+  };
+
   const getClassStatistics = async () => {
     try {
       const res = await axios.get(
@@ -64,6 +78,7 @@ export default function GroupMainPage() {
     const fetchData = async () => {
       await getUserInfo();
       await getClassStatistics();
+      await getClassInfo();
     };
     fetchData();
   }, []);
@@ -99,7 +114,7 @@ export default function GroupMainPage() {
             {/* 모임 정보 */}
             <div style={{ display: "flex", margin: "0", width: "100%" }}>
               <Avatar
-                src={users?.userClass[0]?.classImage || DefaultProfile}
+                src={classInfo.classImage || DefaultProfile}
                 style={{
                   width: 80,
                   height: 80,
@@ -116,10 +131,10 @@ export default function GroupMainPage() {
                 }}
               >
                 <h3 style={{ margin: "0" }}>
-                  {users?.userClass[0]?.className}
+                  {classInfo.className}
                 </h3>
                 <p style={{ margin: "0" }}>
-                  {users?.userClass[0]?.classDescription}
+                  {classInfo.classDescription}
                 </p>
               </div>
             </div>
@@ -148,22 +163,22 @@ export default function GroupMainPage() {
                   columnGap: "5px",
                 }}
               >
-                {users?.userClass[0]?.classMember?.map((user) => (
-                  <div
-                    key={user.email}
-                    style={{ textAlign: "center", width: 85, height: 100 }}
-                    onClick={() =>
-                      navigate(`/member/${user.userName}`, {
-                        state: { user },
-                      })
-                    }
-                  >
-                    <Avatar
-                      src={user.userImage}
-                      style={{ width: 70, height: 70 }}
-                    />
-                    <p>{user.userName}</p>
-                  </div>
+                {classInfo.classMember?.map((user) => (
+                    <div
+                      key={user.userImage}
+                      style={{ textAlign: "center", width: 85, height: 100 }}
+                      onClick={() =>
+                        navigate(`/member/${user.userName}`, {
+                          state: { user },
+                        })
+                      }
+                    >
+                      <Avatar
+                        src={user.userImage}
+                        style={{ width: 70, height: 70 }}
+                      />
+                      <p>{user.userName}</p>
+                    </div>
                 ))}
               </div>
             </div>

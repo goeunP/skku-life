@@ -33,6 +33,8 @@ export default function CertificateBtn({ onUploadSuccess }) {
       return;
     }
     const formData = new FormData();
+    const classId = sessionStorage.getItem("currentGroup");
+    formData.append("classId", classId);
     formData.append("verification", imageFile);
     onUploadSuccess(imageFile.name || null);
     // try {

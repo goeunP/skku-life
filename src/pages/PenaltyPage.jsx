@@ -119,7 +119,7 @@ export default function PenaltyPage() {
     try {
       const classid = sessionStorage.getItem('currentGroup');
       const response = await fetchWithToken(
-        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/penalty/${classid}/log`,
+        `/penalty/${classid}/log`,
       );
       const data = await response.json();
 

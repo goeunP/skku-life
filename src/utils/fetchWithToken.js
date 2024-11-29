@@ -1,19 +1,50 @@
-export async function fetchWithToken(input, init = {}) {
-    const token = sessionStorage.getItem("token"); // 인증 토큰 가져오기
-    //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGxla2RsZjEyMzRAZ21haWwuY29tIiwiaWF0IjoxNzMyNjc4NDcyLCJleHAiOjE3NjQyMTQ0NzJ9.lsNRSfDRiZUZMi0ApNBb_guJk-NTAu-M4tETJkwAGNk";
+export async function fetchWithToken(input, init={}) {
+    const token = sessionStorage.getItem('token');
 
-    if (!token) {
-        throw new Error("Token is missing");
+    const BASEURL = 'https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev';
+
+    let authRequest;
+    if (input instanceof Request) {
+        if (input.url === 'undefined') { throw new Error('Request url is not defined'); }
+        authRequest = new Request(url, {
+            ...input,
+            headers: new Headers({
+                ...Object.fromEntries(input.headers),
+                'Authroization': 'Bearer ' + token
+            })
+        });
+
+    } else {
+        if (input === 'undefined') { throw new Error('Request url is not defined'); }
+        const url = BASEURL + input;
+        init.headers = new Headers(init.headers || {});
+        init.headers.set('Authorization', 'Bearer ' + token);
+        authRequest = new Request(url, init);
     }
-
-    init.headers = new Headers(init.headers || {});
-    init.headers.set("Authorization", `Bearer ${token}`);
-
-    const response = await fetch(input, init);
+    const response = await fetch(authRequest);
     if (!response.ok) {
-        throw new Error(
-            `Error while fetching API: ${response.status} ${response.statusText}`
-        );
+        const data = await response.json();
+        if (response.status == 401) {
+            if (data.message == "Unauthorized") {
+                window.location.href = '/signin';
+                return null;
+            } else if (data.message == "Account not verified") {
+                window.location.href = '/email-verification';
+                return null;
+            }
+        }
+
+        if (response.statusText == "Unauthorized") {
+            window.location.href = '/signin';
+            return null;
+        } else if (response.statusText == "Account not verified") {
+            window.location.href = '/email-verification';
+            return null;
+        }
+
+        console.error("Error while fetching api: " + response.status + " " + response.statusText);
+        console.error("Request url: " + authRequest.url);
+        throw new Error("Error while fetching api: " + response.status + " " + response.statusText);
     }
 
     return response;

@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import MainMemberCertificate from "../components/main/MainMemberCertificate";
+import { fetchWithToken } from "../utils/fetchWithToken";
 
 export default function GroupMemberPage() {
   const location = useLocation();
@@ -70,12 +71,22 @@ export default function GroupMemberPage() {
           },
         }
       );
-      setClassInfo(res.data.userClass[0]);
+      //setClassInfo(res.data.userClass[0]);
       setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
   };
+
+  const getClassInfo = async () => {
+    try {
+      const res = await fetchWithToken("/class/" + classId, { method: "GET"});
+      const data = await res.json();
+      setClassInfo(data[0]);
+    } catch (error) {
+      console.error("Error fetching class info:", error);
+    }
+  }
 
   const getCertification = async () => {
     const dates = getDateRange(6);
@@ -112,6 +123,7 @@ export default function GroupMemberPage() {
 
   useEffect(() => {
     getUserInfo();
+    getClassInfo();
   }, []);
 
   useEffect(() => {
