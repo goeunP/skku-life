@@ -43,7 +43,7 @@ export default function PenaltyPage() {
     const baseStyle = {
       padding: "10px",
       borderRadius: "20px",
-      marginBottom: "10px",
+      marginBottom: "5px"
     };
 
     switch (type) {
@@ -52,6 +52,7 @@ export default function PenaltyPage() {
           ...baseStyle,
           backgroundColor: "#FFAFB0",
         };
+      /*
       case "nopenalty":
         return {
           ...baseStyle,
@@ -59,9 +60,9 @@ export default function PenaltyPage() {
           textAlign: "center",
           fontWeight: "bold",
           padding: "20px",
-          margin: "15px 0",
           fontSize: "18px",
         };
+      */
       default:
         return {
           ...baseStyle,
@@ -72,6 +73,7 @@ export default function PenaltyPage() {
 
   // 메시지 내용 렌더링
   const MessageContent = ({ message }) => {
+    /*
     if (message.type === "nopenalty") {
       return (
         <div
@@ -88,6 +90,7 @@ export default function PenaltyPage() {
         </div>
       );
     }
+    */
     return <div>{message.content}</div>;
   };
 
@@ -96,8 +99,8 @@ export default function PenaltyPage() {
     <div
       style={{
         textAlign: "center",
-        margin: "20px 0",
         position: "relative",
+        marginBottom: "20px"
       }}
     >
       <div
@@ -110,7 +113,7 @@ export default function PenaltyPage() {
           color: "#666",
         }}
       >
-        {date}
+        <h3>{date}</h3>
       </div>
     </div>
   );
@@ -120,7 +123,7 @@ export default function PenaltyPage() {
     try {
       const classid = sessionStorage.getItem('currentGroup');
       const response = await fetchWithToken(
-        `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/penalty/${classid}/log`,
+        `/penalty/${classid}/log`,
       );
       const data = await response.json();
 
@@ -173,6 +176,7 @@ export default function PenaltyPage() {
       const allDates = generateDateRange(startDate, yesterday);
 
       // 모든 날짜에 대해 로그가 없으면 'nopenalty' 메시지 추가
+      /*
       allDates.forEach((date) => {
         const dateStr = formatDate(date);
         if (!messagesByDate[dateStr]) {
@@ -187,6 +191,7 @@ export default function PenaltyPage() {
           ];
         }
       });
+      */
 
       // messagesByDate 객체를 배열로 변환
       const formattedMessages = Object.values(messagesByDate).flat();
@@ -210,16 +215,18 @@ export default function PenaltyPage() {
   return (
     <div
       style={{
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
+        gap: "15px",
         margin: "0",
-        padding: "0",
-        boxSizing: "border-box",
-        color: "#333",
-        paddingTop: "120px",
+        marginTop: "120px",
       }}
     >
-      <Header />
-      <Nav />
+      <div style={{ margin: "0" }}>
+        <Header />
+        <Nav />
+      </div>
 
       <div
         style={{
@@ -235,7 +242,7 @@ export default function PenaltyPage() {
             width: "100%",
             maxWidth: "600px",
             boxSizing: "border-box",
-            borderRadius: "20px",
+            
           }}
         >
           {error ? (
@@ -276,8 +283,8 @@ export default function PenaltyPage() {
                     style={{
                       fontSize: "12px",
                       color: "#888",
-                      marginBottom: "10px",
                       textAlign: "left",
+                      marginBottom: '20px'
                     }}
                   >
                     {message.time}

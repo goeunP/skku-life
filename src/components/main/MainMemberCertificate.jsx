@@ -24,7 +24,8 @@ export default function MainMemberCertificate({ image, date, status }) {
         flexDirection: "row",
         gap: "10px",
         padding: "20px",
-        justifyContent: "flex-start"
+        justifyContent: "flex-start",
+        marginBottom: "20px"
       }}
     >
       {" "}

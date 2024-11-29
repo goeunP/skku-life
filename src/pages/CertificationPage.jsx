@@ -4,6 +4,7 @@ import CertificateBtn from "../components/certificate/CertificateBtn.jsx";
 import CertificateMember from "../components/certificate/CertificateMember";
 import Nav from "../components/common/Nav";
 import axios from "axios";
+import { fetchWithToken } from "../utils/fetchWithToken.js";
 
 export default function CertificationPage() {
   //const token = sessionStorage.getItem("token");
@@ -25,6 +26,16 @@ export default function CertificationPage() {
       dates.push(formatDate(date));
     }
     return dates;
+  };
+
+  const formatDate2 = (date) => {
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dayOfWeek = days[date.getDay()];
+
+    return `${year}년 ${month}월 ${day}일 ${dayOfWeek}요일`;
   };
 
   const mergeVerificationData = (dates, classMembers, verifications) => {
@@ -58,6 +69,7 @@ export default function CertificationPage() {
   };
 
   const handleUploadSuccess = (uploadedImage) => {
+    /*
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -82,6 +94,8 @@ export default function CertificationPage() {
       return day;
     });
     setCertification(updatedCertification);
+    */
+    window.location.reload();
   };
   const getUserInfo = async () => {
     try {
@@ -93,12 +107,25 @@ export default function CertificationPage() {
           },
         }
       );
-      setClassInfo(res.data.userClass[0]);
+
+      //setClassInfo(res.data.userClass[0]);
       setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
   };
+
+  const getClassInfo = async () => {
+    try {
+      let classId = sessionStorage.getItem("currentGroup");
+      const res = await fetchWithToken("/class/" + classId);
+      const data = await res.json();
+      setClassInfo(data[0]);
+    } catch (error) {
+      console.error("Error fetching class info:", error);
+    }
+  };
+
   const getCertification = async () => {
     const dates = getDateRange(5);
     const requests = dates.map((date) =>
@@ -132,6 +159,7 @@ export default function CertificationPage() {
   };
   useEffect(() => {
     getUserInfo();
+    getClassInfo();
   }, []);
 
   useEffect(() => {
@@ -147,6 +175,7 @@ export default function CertificationPage() {
         width: "100%",
         margin: "0",
         marginTop: "120px",
+        gap: "15px",
       }}
     >
       <div style={{ margin: "0" }}>
@@ -157,8 +186,8 @@ export default function CertificationPage() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "10px",
-          margin: "0 10px",
+          marginLeft: "10px",
+          marginRight: "10px",
         }}
       >
         <CertificateBtn
@@ -167,25 +196,64 @@ export default function CertificationPage() {
         />
         {certification.map(({ date, verifications }) => (
           <div key={date} style={{ width: "100%" }}>
-            <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
-              {date}
+            <div style={{ fontWeight: "bold" }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  position: "relative",
+                  marginBottom: "20px",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "#E8E8E8",
+                    padding: "5px 15px",
+                    borderRadius: "15px",
+                    display: "inline-block",
+                    fontSize: "13px",
+                    color: "#666",
+                  }}
+                >
+                  <h3>{formatDate2(new Date(date))}</h3>
+                </div>
+              </div>
             </div>
-            {verifications.map((data, index) => (
-              <CertificateMember
-                key={index}
-                id={data.verificationId}
-                date={data.verificationDate}
-                userName={data.userName}
-                totalCnt={classInfo.classMember.length}
-                curCnt={data.yesVote + data.noVote}
-                status={"none"}
-                setStatus={setStatus}
-                profileImg={data.userImage}
-                img={data.verificationImage}
-                yesVote={data.yesVote}
-                noVote={data.noVote}
-              />
-            ))}
+            {verifications.map((data, index) =>
+              index === 3 ? (
+                <CertificateMember
+                  key={index}
+                  id={data.verificationId}
+                  date={data.verificationDate}
+                  userName={data.userName}
+                  totalCnt={classInfo.classMember.length}
+                  curCnt={data.yesVote + data.noVote}
+                  status={"none"}
+                  setStatus={setStatus}
+                  profileImg={data.userImage}
+                  img={data.verificationImae}
+                  yesVote={data.yesVote}
+                  noVote={data.noVote}
+                />
+              ) : null
+            )}
+            {verifications.map((data, index) =>
+              index === 3 ? null : (
+                <CertificateMember
+                  key={index}
+                  id={data.verificationId}
+                  date={data.verificationDate}
+                  userName={data.userName}
+                  totalCnt={classInfo.classMember.length}
+                  curCnt={data.yesVote + data.noVote}
+                  status={"none"}
+                  setStatus={setStatus}
+                  profileImg={data.userImage}
+                  img={data.verificationImage}
+                  yesVote={data.yesVote}
+                  noVote={data.noVote}
+                />
+              )
+            )}
           </div>
         ))}
       </div>

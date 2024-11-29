@@ -19,6 +19,7 @@ export default function CertificateMember({
   const [no, setNo] = useState(noVote);
   const [updateStatus, setUpdateStatus] = useState(status);
   const today = "2024-11-30";
+  const [voted, setVoted] = useState(false);
 
   // 상태에 따른 색상 설정
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function CertificateMember({
     } else {
       setNo((prevNo) => prevNo + 1);
     }
+    setVoted(true);
   };
 
   useEffect(() => {
@@ -64,11 +66,12 @@ export default function CertificateMember({
         gap: "10px",
         padding: "20px",
         justifyContent: "flex-start",
-        marginTop: "10px",
+        marginBottom: "20px",
       }}
     >
       <Avatar
-        src={img.slice(0, 5) === "https" ? img : "src/assets/logo.png"}
+        src={img ? img : "src/assets/test.jpg"}
+        alt="user"
         style={{
           width: "80px",
           height: "80px",
@@ -83,12 +86,22 @@ export default function CertificateMember({
         </div>
       </div>
       {/* verificationImage가 null이면 "인증 업로드 전입니다." 메시지 표시 */}
-      {!img ? (
+      {false ? (
         <div style={{ width: "20%", textAlign: "center" }}>
           인증 업로드 전입니다.
         </div>
-      ) : updateStatus === "none" && date === today ? (
-        <div style={{ width: "20%", gap: "10px", display: "flex" }}>
+      ) : updateStatus === "none" &&
+        date === today &&
+        !voted &&
+        userName != "최다일" ? (
+        <div
+          style={{
+            width: "120px",
+            gap: "10px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <button
             style={{
               width: "30px",
@@ -96,6 +109,7 @@ export default function CertificateMember({
               backgroundColor: "lightgreen",
               textAlign: "center",
               padding: "0px",
+              margin: "0px",
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -111,6 +125,7 @@ export default function CertificateMember({
               backgroundColor: "pink",
               textAlign: "center",
               padding: "0px",
+              margin: "0px",
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -121,11 +136,13 @@ export default function CertificateMember({
           </button>
         </div>
       ) : updateStatus === "fail" ? (
-        <div style={{ width: "20%", textAlign: "center" }}>인증 실패</div>
+        <div style={{ width: "120px", textAlign: "center" }}>인증 실패</div>
       ) : updateStatus === "success" ? (
-        <div style={{ width: "20%", textAlign: "center" }}>인증 성공</div>
+        <div style={{ width: "120px", textAlign: "center" }}>인증 성공</div>
+      ) : userName == "최다일" ? (
+        <div style={{ width: "120px", textAlign: "center" }}>본인 투표</div>
       ) : (
-        <div style={{ width: "20%", textAlign: "center" }}>미인증</div>
+        <div style={{ width: "120px", textAlign: "center" }}>투표 완료</div>
       )}
     </div>
   );

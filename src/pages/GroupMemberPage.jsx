@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import MainMemberCertificate from "../components/main/MainMemberCertificate";
+import { fetchWithToken } from "../utils/fetchWithToken";
 
 export default function GroupMemberPage() {
   const location = useLocation();
@@ -73,15 +74,25 @@ export default function GroupMemberPage() {
           },
         }
       );
-      setClassInfo(res.data.userClass[0]);
+      //setClassInfo(res.data.userClass[0]);
       setUserInfo(res.data);
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
   };
 
+  const getClassInfo = async () => {
+    try {
+      const res = await fetchWithToken("/class/" + classId, { method: "GET"});
+      const data = await res.json();
+      setClassInfo(data[0]);
+    } catch (error) {
+      console.error("Error fetching class info:", error);
+    }
+  }
+
   const getCertification = async () => {
-    const dates = getDateRange(5);
+    const dates = getDateRange(6);
     const requests = dates.map((date) =>
       axios.get(
         `https://nsptbxlxoj.execute-api.ap-northeast-2.amazonaws.com/dev/verification/${classId}/${date}`,
@@ -115,6 +126,7 @@ export default function GroupMemberPage() {
 
   useEffect(() => {
     getUserInfo();
+    getClassInfo();
   }, []);
 
   useEffect(() => {
@@ -146,7 +158,7 @@ export default function GroupMemberPage() {
           margin: "0 10px",
         }}
       >
-        <div style={{ display: "flex", margin: "0", width: "100%" }}>
+        <div style={{ display: "flex", margin: "0", width: "100%", }}>
           <Avatar
             src={user.userImage}
             alt="user"
@@ -164,8 +176,6 @@ export default function GroupMemberPage() {
 
         <div style={{ width: "100%" }}>
           <h3 style={{ marginBottom: "5px" }}>인증 현황</h3>
-        </div>
-
         {/* 각 날짜별 user.userName과 일치하는 데이터만 렌더링 */}
         {certification.map((d) => {
           const userVerification = d.verifications.filter(
@@ -183,6 +193,7 @@ export default function GroupMemberPage() {
             )
           );
         })}
+        </div>
       </div>
     </div>
   );
