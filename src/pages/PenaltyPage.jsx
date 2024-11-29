@@ -52,6 +52,7 @@ export default function PenaltyPage() {
           ...baseStyle,
           backgroundColor: "#FFAFB0",
         };
+      /*
       case "nopenalty":
         return {
           ...baseStyle,
@@ -61,6 +62,7 @@ export default function PenaltyPage() {
           padding: "20px",
           fontSize: "18px",
         };
+      */
       default:
         return {
           ...baseStyle,
@@ -71,6 +73,7 @@ export default function PenaltyPage() {
 
   // 메시지 내용 렌더링
   const MessageContent = ({ message }) => {
+    /*
     if (message.type === "nopenalty") {
       return (
         <div
@@ -87,6 +90,7 @@ export default function PenaltyPage() {
         </div>
       );
     }
+    */
     return <div>{message.content}</div>;
   };
 
@@ -172,6 +176,7 @@ export default function PenaltyPage() {
       const allDates = generateDateRange(startDate, yesterday);
 
       // 모든 날짜에 대해 로그가 없으면 'nopenalty' 메시지 추가
+      /*
       allDates.forEach((date) => {
         const dateStr = formatDate(date);
         if (!messagesByDate[dateStr]) {
@@ -186,6 +191,7 @@ export default function PenaltyPage() {
           ];
         }
       });
+      */
 
       // messagesByDate 객체를 배열로 변환
       const formattedMessages = Object.values(messagesByDate).flat();
