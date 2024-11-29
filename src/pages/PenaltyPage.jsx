@@ -52,15 +52,15 @@ export default function PenaltyPage() {
           ...baseStyle,
           backgroundColor: "#FFAFB0",
         };
-      case "nopenalty":
-        return {
-          ...baseStyle,
-          backgroundColor: "#C8FFC3",
-          textAlign: "center",
-          fontWeight: "bold",
-          padding: "20px",
-          fontSize: "18px",
-        };
+      // case "nopenalty":
+      //   return {
+      //     ...baseStyle,
+      //     backgroundColor: "#C8FFC3",
+      //     textAlign: "center",
+      //     fontWeight: "bold",
+      //     padding: "20px",
+      //     fontSize: "18px",
+      //   };
       default:
         return {
           ...baseStyle,
@@ -71,22 +71,22 @@ export default function PenaltyPage() {
 
   // 메시지 내용 렌더링
   const MessageContent = ({ message }) => {
-    if (message.type === "nopenalty") {
-      return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          }}
-        >
-          <span style={{ fontSize: "16px" }}>🎉</span>
-          {message.content}
-          <span style={{ fontSize: "16px" }}>🎉</span>
-        </div>
-      );
-    }
+    // if (message.type === "nopenalty") {
+    //   return (
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //         gap: "8px",
+    //       }}
+    //     >
+    //       <span style={{ fontSize: "16px" }}>🎉</span>
+    //       {message.content}
+    //       <span style={{ fontSize: "16px" }}>🎉</span>
+    //     </div>
+    //   );
+    // }
     return <div>{message.content}</div>;
   };
 
@@ -172,20 +172,20 @@ export default function PenaltyPage() {
       const allDates = generateDateRange(startDate, yesterday);
 
       // 모든 날짜에 대해 로그가 없으면 'nopenalty' 메시지 추가
-      allDates.forEach((date) => {
-        const dateStr = formatDate(date);
-        if (!messagesByDate[dateStr]) {
-          messagesByDate[dateStr] = [
-            {
-              date: dateStr,
-              time: "00:00",
-              content: "모두가 인증을 완료했습니다",
-              type: "nopenalty",
-              timestamp: date.getTime(),
-            },
-          ];
-        }
-      });
+      // allDates.forEach((date) => {
+      //   const dateStr = formatDate(date);
+      //   if (!messagesByDate[dateStr]) {
+      //     messagesByDate[dateStr] = [
+      //       {
+      //         date: dateStr,
+      //         time: "00:00",
+      //         content: "모두가 인증을 완료했습니다",
+      //         type: "nopenalty",
+      //         timestamp: date.getTime(),
+      //       },
+      //     ];
+      //   }
+      // });
 
       // messagesByDate 객체를 배열로 변환
       const formattedMessages = Object.values(messagesByDate).flat();
