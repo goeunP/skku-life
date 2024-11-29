@@ -12,6 +12,7 @@ export default function CertificationPage() {
   const [certification, setCertification] = useState([]);
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
+  const [isUploaded, setIsUploaded] = useState(false); // 업로드 상태 추가
   const today = new Date(2024, 10, 29);
   today.setDate(today.getDate() + 2);
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -36,7 +37,6 @@ export default function CertificationPage() {
 
     return `${year}년 ${month}월 ${day}일 ${dayOfWeek}요일`;
   };
-
 
   const mergeVerificationData = (dates, classMembers, verifications) => {
     const verificationMap = verifications.reduce((acc, verification) => {
@@ -69,7 +69,6 @@ export default function CertificationPage() {
   };
 
   const handleUploadSuccess = (uploadedImage) => {
-    /*
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -94,9 +93,9 @@ export default function CertificationPage() {
       return day;
     });
     setCertification(updatedCertification);
-    */
-    window.location.reload();
+    setIsUploaded(true); // 업로드 성공 시 버튼 숨기기
   };
+
   const getUserInfo = async () => {
     try {
       const res = await axios.get(
@@ -124,7 +123,7 @@ export default function CertificationPage() {
     } catch (error) {
       console.error("Error fetching class info:", error);
     }
-  }
+  };
 
   const getCertification = async () => {
     const dates = getDateRange(5);
@@ -157,6 +156,7 @@ export default function CertificationPage() {
       console.error("Error fetching certification data:", error);
     }
   };
+
   useEffect(() => {
     getUserInfo();
     getClassInfo();
@@ -167,6 +167,7 @@ export default function CertificationPage() {
       getCertification();
     }
   }, [classInfo]);
+
   return (
     <div
       style={{
@@ -175,7 +176,7 @@ export default function CertificationPage() {
         width: "100%",
         margin: "0",
         marginTop: "120px",
-        gap: "15px"
+        gap: "15px",
       }}
     >
       <div style={{ margin: "0" }}>
@@ -190,70 +191,73 @@ export default function CertificationPage() {
           marginRight: "10px",
         }}
       >
-        <CertificateBtn
-          classId={classInfo.classId}
-          onUploadSuccess={handleUploadSuccess}
-        />
+        {/* 업로드 성공 시 버튼 숨기기 */}
+        {!isUploaded && (
+          <CertificateBtn
+            classId={classInfo.classId}
+            onUploadSuccess={handleUploadSuccess}
+          />
+        )}
         {certification.map(({ date, verifications }) => (
-          <div key={date} style={{ width: "100%",  }}>
-            <div style={{ fontWeight: "bold", }}>
-            <div
-      style={{
-        textAlign: "center",
-        position: "relative",
-        marginBottom: "20px"
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#E8E8E8",
-          padding: "5px 15px",
-          borderRadius: "15px",
-          display: "inline-block",
-          fontSize: "13px",
-          color: "#666",
-        }}
-      >
-        <h3>{formatDate2(new Date(date))}</h3>
-      </div>
-    </div>
+          <div key={date} style={{ width: "100%" }}>
+            <div style={{ fontWeight: "bold" }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  position: "relative",
+                  marginBottom: "20px",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "#E8E8E8",
+                    padding: "5px 15px",
+                    borderRadius: "15px",
+                    display: "inline-block",
+                    fontSize: "13px",
+                    color: "#666",
+                  }}
+                >
+                  <h3>{formatDate2(new Date(date))}</h3>
+                </div>
+              </div>
             </div>
             {verifications.map((data, index) =>
-  index === 3 ? (
-    <CertificateMember
-      key={index}
-      id={data.verificationId}
-      date={data.verificationDate}
-      userName={data.userName}
-      totalCnt={classInfo.classMember.length}
-      curCnt={data.yesVote + data.noVote}
-      status={"none"}
-      setStatus={setStatus}
-      profileImg={data.userImage}
-      img={data.verificationImae}
-      yesVote={data.yesVote}
-      noVote={data.noVote}
-    />
-  ) : null
-)}
+              index === 3 ? (
+                <CertificateMember
+                  key={index}
+                  id={data.verificationId}
+                  date={data.verificationDate}
+                  userName={data.userName}
+                  totalCnt={classInfo.classMember.length}
+                  curCnt={data.yesVote + data.noVote}
+                  status={"none"}
+                  setStatus={setStatus}
+                  profileImg={data.userImage}
+                  img={data.verificationImage}
+                  yesVote={data.yesVote}
+                  noVote={data.noVote}
+                />
+              ) : null
+            )}
             {verifications.map((data, index) =>
-  index === 3 ? null : (
-    <CertificateMember
-      key={index}
-      id={data.verificationId}
-      date={data.verificationDate}
-      userName={data.userName}
-      totalCnt={classInfo.classMember.length}
-      curCnt={data.yesVote + data.noVote}
-      status={"none"}
-      setStatus={setStatus}
-      profileImg={data.userImage}
-      img={data.verificationImage}
-      yesVote={data.yesVote}
-      noVote={data.noVote}
-    />
-  )
-)}
+              index === 3 ? null : (
+                <CertificateMember
+                  key={index}
+                  id={data.verificationId}
+                  date={data.verificationDate}
+                  userName={data.userName}
+                  totalCnt={classInfo.classMember.length}
+                  curCnt={data.yesVote + data.noVote}
+                  status={"none"}
+                  setStatus={setStatus}
+                  profileImg={data.userImage}
+                  img={data.verificationImage}
+                  yesVote={data.yesVote}
+                  noVote={data.noVote}
+                />
+              )
+            )}
           </div>
         ))}
       </div>

@@ -39,6 +39,7 @@ export default function GroupMainPage() {
         }
       );
       setUsers(res.data);
+      console.log("users", res.data.userClass[0].classMember);
     } catch (error) {
       console.error("Error fetching user info:", error);
     } finally {
@@ -48,8 +49,8 @@ export default function GroupMainPage() {
 
   const getClassInfo = async () => {
     try {
-      const res = await fetchWithToken('/class/' + classId, {
-        method: 'GET'
+      const res = await fetchWithToken("/class/" + classId, {
+        method: "GET",
       });
       const data = await res.json();
       setClassInfo(data[0]);
@@ -130,12 +131,8 @@ export default function GroupMainPage() {
                   margin: "auto 0",
                 }}
               >
-                <h3 style={{ margin: "0" }}>
-                  {classInfo.className}
-                </h3>
-                <p style={{ margin: "0" }}>
-                  {classInfo.classDescription}
-                </p>
+                <h3 style={{ margin: "0" }}>{classInfo.className}</h3>
+                <p style={{ margin: "0" }}>{classInfo.classDescription}</p>
               </div>
             </div>
 
@@ -164,21 +161,21 @@ export default function GroupMainPage() {
                 }}
               >
                 {classInfo.classMember?.map((user) => (
-                    <div
-                      key={user.userImage}
-                      style={{ textAlign: "center", width: 85, height: 100 }}
-                      onClick={() =>
-                        navigate(`/member/${user.userName}`, {
-                          state: { user },
-                        })
-                      }
-                    >
-                      <Avatar
-                        src={user.userImage}
-                        style={{ width: 70, height: 70 }}
-                      />
-                      <p>{user.userName}</p>
-                    </div>
+                  <div
+                    key={user.userImage}
+                    style={{ textAlign: "center", width: 85, height: 100 }}
+                    onClick={() =>
+                      navigate(`/member/${user.userName}`, {
+                        state: { user },
+                      })
+                    }
+                  >
+                    <Avatar
+                      src={user.userImage}
+                      style={{ width: 70, height: 70 }}
+                    />
+                    <p>{user.userName}</p>
+                  </div>
                 ))}
               </div>
             </div>
