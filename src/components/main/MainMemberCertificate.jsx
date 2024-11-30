@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Avatar } from "@mui/material";
+import { Avatar, tableBodyClasses } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -52,8 +52,10 @@ export default function MainMemberCertificate({ image, date, status }) {
       </div>
       {status === "success" ? (
         <div style={{ width: "120px", textAlign: "center" }}>인증 성공</div>
-      ) : (
+      ) : status === "fail" ? (
         <div style={{ width: "120px", textAlign: "center" }}>인증 실패</div>
+      ) :  (
+        <div style={{ width: "120px", textAlign: "center"}}>인증 진행중</div>
       )}
       </div>
     </div>

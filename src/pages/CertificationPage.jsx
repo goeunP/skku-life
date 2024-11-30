@@ -13,8 +13,9 @@ export default function CertificationPage() {
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false); // 업로드 상태 추가
-  const today = new Date(2024, 10, 29);
-  today.setDate(today.getDate() + 2);
+  //const today = new Date(2024, 10, 29);
+  const today = new Date();
+  //today.setDate(today.getDate() + 2);
   const formatDate = (date) => date.toISOString().split("T")[0];
   const todayDate = formatDate(today); // 오늘 날짜
   const [status, setStatus] = useState("none");
@@ -99,7 +100,7 @@ export default function CertificationPage() {
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const date = `${year}-${month}-${day}`;
-    await fetchWithToken(`/verification/${classInfo.classId}/${date}`, {
+    fetchWithToken(`/verification/${classInfo.classId}/${date}`, {
       method: "GET",
       headers: {
         "X-Use-Network": 'true'

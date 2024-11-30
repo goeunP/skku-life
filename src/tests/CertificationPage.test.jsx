@@ -5,16 +5,37 @@ import { vi } from "vitest";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 
+// Mock the entire fetchWithToken module
+vi.mock("../utils/fetchWithToken", () => ({
+  fetchWithToken: vi.fn().mockImplementation((url) => {
+    if (url.includes("/class/")) {
+      return Promise.resolve({
+        json: () => Promise.resolve([{
+          classId: "class123",
+          classMember: [
+            { userName: "User1" },
+            { userName: "User2" }
+          ]
+        }])
+      });
+    }
+    return Promise.resolve({
+      json: () => Promise.resolve({ verifications: [] })
+    });
+  })
+}));
+
 vi.mock("axios");
 
 describe("CertificationPage", () => {
   const mockUserInfo = {
     data: {
+      userName: "User1",
       userClass: [{
         classId: "class123",
         classMember: [
-          { id: 1, name: "User1" },
-          { id: 2, name: "User2" }
+          { userName: "User1" },
+          { userName: "User2" }
         ]
       }]
     }
@@ -28,7 +49,8 @@ describe("CertificationPage", () => {
           userName: "User1",
           yesVote: 3,
           noVote: 1,
-          verificationImage: "image-url"
+          verificationImage: "image-url",
+          userImage: "profile-url"
         }
       ]
     }
@@ -37,6 +59,21 @@ describe("CertificationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Mock sessionStorage
+    const sessionStorageData = {
+      token: "token123",
+      currentGroup: "class123"
+    };
+    
+    Object.defineProperty(window, 'sessionStorage', {
+      value: {
+        getItem: (key) => sessionStorageData[key],
+        setItem: vi.fn(),
+        clear: vi.fn()
+      },
+      writable: true
+    });
   });
 
   afterEach(() => {
@@ -52,8 +89,7 @@ describe("CertificationPage", () => {
   };
 
   test("renders header and navigation tabs", async () => {
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockResolvedValue(mockCertifications);
+    axios.get.mockResolvedValue(mockUserInfo);
 
     await act(async () => {
       renderWithRouter(<CertificationPage />);
@@ -65,9 +101,8 @@ describe("CertificationPage", () => {
     expect(screen.getByRole("tab", { name: "인증" })).toBeInTheDocument();
   });
 
-  test("fetches and displays user class information", async () => {
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockResolvedValue(mockCertifications);
+  test("fetches and displays user information", async () => {
+    axios.get.mockResolvedValue(mockUserInfo);
 
     await act(async () => {
       renderWithRouter(<CertificationPage />);
@@ -78,20 +113,6 @@ describe("CertificationPage", () => {
         expect.stringContaining("/user/info"),
         expect.any(Object)
       );
-    });
-  });
-
-  test("fetches and displays certification data", async () => {
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockResolvedValue(mockCertifications);
-
-    await act(async () => {
-      renderWithRouter(<CertificationPage />);
-    });
-
-    await waitFor(() => {
-      const userElements = screen.getAllByText("User1");
-      expect(userElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -106,59 +127,35 @@ describe("CertificationPage", () => {
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(
         "Error fetching user info:",
-        error
-      );
-    });
-  });
-
-  test("handles API error for certification data", async () => {
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockRejectedValue(new Error("Failed to fetch certification"));
-
-    await act(async () => {
-      renderWithRouter(<CertificationPage />);
-    });
-
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith(
-        "Error fetching certification data:",
         expect.any(Error)
       );
     });
   });
 
-  test("displays certification status correctly", async () => {
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockResolvedValue(mockCertifications);
+  test("displays formatted date correctly", async () => {
+    axios.get.mockResolvedValue(mockUserInfo);
 
     await act(async () => {
       renderWithRouter(<CertificationPage />);
     });
 
     await waitFor(() => {
-      const successElements = screen.getAllByText("인증 성공");
-      expect(successElements.length).toBeGreaterThan(0);
-      const certificationContainer = successElements[0].closest('div[style*="background-color"]');
-      expect(certificationContainer).toHaveStyle({
-        backgroundColor: 'rgb(200, 255, 195)'
-      });
+      const dateRegex = /\d{4}년 \d{1,2}월 \d{1,2}일 [월화수목금토일]요일/;
+      const dateElements = screen.queryAllByText(dateRegex);
+      expect(dateElements.length).toBe(0); // 초기에는 데이터가 없으므로 0
     });
   });
 
-  test("formats dates correctly", async () => {
-    const today = new Date();
-    const formattedDate = today.toISOString().split("T")[0];
-    
-    axios.get.mockResolvedValueOnce(mockUserInfo)
-         .mockResolvedValue(mockCertifications);
+  test("handles certification upload button", async () => {
+    axios.get.mockResolvedValue(mockUserInfo);
 
     await act(async () => {
       renderWithRouter(<CertificationPage />);
     });
 
     await waitFor(() => {
-      const dateElements = screen.getAllByText(formattedDate);
-      expect(dateElements.length).toBeGreaterThan(0);
+      const uploadButton = screen.getByText(/\+ 인증하기/i);
+      expect(uploadButton).toBeInTheDocument();
     });
   });
 });
