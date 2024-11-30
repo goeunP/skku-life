@@ -100,7 +100,7 @@ export default function CertificationPage() {
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const date = `${year}-${month}-${day}`;
-    await fetchWithToken(`/verification/${classInfo.classId}/${date}`, {
+    fetchWithToken(`/verification/${classInfo.classId}/${date}`, {
       method: "GET",
       headers: {
         "X-Use-Network": 'true'
