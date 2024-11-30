@@ -13,8 +13,9 @@ export default function CertificationPage() {
   const [classInfo, setClassInfo] = useState("");
   const [userInfo, setUserInfo] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false); // 업로드 상태 추가
-  const today = new Date(2024, 10, 29);
-  today.setDate(today.getDate() + 2);
+  //const today = new Date(2024, 10, 29);
+  const today = new Date();
+  //today.setDate(today.getDate() + 2);
   const formatDate = (date) => date.toISOString().split("T")[0];
   const todayDate = formatDate(today); // 오늘 날짜
   const [status, setStatus] = useState("none");
