@@ -9,6 +9,8 @@ import Chart from "../components/main/Chart";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 export default function GroupMainPage() {
+  const [imageSrc, setImageSrc] = useState(DefaultProfile);
+
   const [statistics, setStatistics] = useState([]);
   const navigate = useNavigate();
   const [users, setUsers] = useState({
@@ -101,7 +103,26 @@ export default function GroupMainPage() {
       await getClassInfo();
     };
     fetchData();
-  }, []);
+
+    const fetchImage = async () => {
+      if(classInfo.classImage) {
+        try {
+          const response = await fetch(classInfo.classImage, { mode: "cors" });
+          if (response.ok) {
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            setImageSrc(imageUrl);
+          } else {
+            console.error("Failed to fetch image:", response);
+          }
+        } catch (error) {
+          console.error("Error fetching image:", error);
+        }
+      }
+    };
+
+    fetchImage();
+  }, [classInfo.classImage]);
 
   return (
     <div
@@ -134,7 +155,8 @@ export default function GroupMainPage() {
             {/* 모임 정보 */}
             <div style={{ display: "flex", margin: "0", width: "100%" }}>
               <Avatar
-                src={classInfo.classImage || DefaultProfile}
+                src={imageSrc}
+                crossOrigin="anonymous"
                 style={{
                   width: 80,
                   height: 80,
