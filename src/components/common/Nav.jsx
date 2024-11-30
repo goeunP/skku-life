@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Link, useLocation } from "react-router-dom";
-import HtmlLoader from "@/components/common/HtmlLoader";
 
 export default function Nav() {
   const location = useLocation();
