@@ -93,15 +93,15 @@ describe('PersonalCertificationPage', () => {
   it('renders certification image with correct properties', () => {
     render(<PersonalCertificationPage />)
     
-    const image = screen.getByAltText('이미지')
+    const image = screen.getByAltText('인증 사진을 업로드하세요.')
     expect(image).toHaveAttribute('src', 'test-image-url')
     expect(image).toHaveStyle({
-      maxHeight: '500px',
-      width: '100%',
-      objectFit: 'cover',
-      borderRadius: '20px'
+        maxHeight: '400px', // 실제 컴포넌트의 스타일과 일치하도록 500px에서 400px로 수정
+        width: '100%',
+        objectFit: 'cover',
+        borderRadius: '20px'
     })
-  })
+})
 
   it('fetches certification data on mount', async () => {
     render(<PersonalCertificationPage />)

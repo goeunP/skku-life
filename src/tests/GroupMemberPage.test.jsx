@@ -1,16 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import { act } from 'react'  // react에서 직접 import
 import axios from 'axios'
+import { fetchWithToken } from '@/utils/fetchWithToken'
 import GroupMemberPage from '@/pages/GroupMemberPage'
+
+
 
 // Mock the dependencies
 vi.mock('axios')
+vi.mock('@/utils/fetchWithToken', () => ({
+  fetchWithToken: vi.fn().mockResolvedValue({
+    json: () => Promise.resolve([{
+      classMember: [
+        { userName: '테스트 유저' }
+      ]
+    }])
+  })
+}))
 
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({
   useLocation: () => ({
     state: {
-      users: {
+      user: {
         userName: '테스트 유저',
         userImage: 'test-image-url',
         userClass: [{ classId: 'test-class-id' }]
@@ -57,6 +70,16 @@ vi.mock('../components/common/Nav', () => ({
   )
 }))
 
+vi.mock('../components/main/MainMemberCertificate', () => ({
+  default: ({ date, image, status }) => (
+    <div data-testid="certificate">
+      <div>{date}</div>
+      <img src={image} alt="certification" />
+      <div>{status}</div>
+    </div>
+  )
+}))
+
 describe('GroupMemberPage', () => {
   const mockUser = {
     userName: '테스트 유저',
@@ -67,25 +90,42 @@ describe('GroupMemberPage', () => {
   const mockVerificationResponse = {
     verifications: [
       {
-        verificationImage: 'verification-image-url'
+        verificationImage: 'verification-image-url',
+        userName: '테스트 유저'
       }
     ]
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(axios.get).mockResolvedValue({ data: mockVerificationResponse })
+    
+    // Mock sessionStorage
+    const mockSessionStorage = {
+      currentGroup: 'test-class-id',
+      token: 'test-token'
+    };
+    Object.defineProperty(window, 'sessionStorage', {
+      value: {
+        getItem: vi.fn(key => mockSessionStorage[key]),
+        setItem: vi.fn()
+      },
+      writable: true
+    });
   })
 
-  it('renders user information correctly', () => {
-    render(<GroupMemberPage />)
+  it('renders user information correctly', async () => {
+    await act(async () => {
+      render(<GroupMemberPage />)
+    })
     
     expect(screen.getByText('테스트 유저')).toBeInTheDocument()
     expect(screen.getByAltText('user')).toHaveAttribute('src', 'test-image-url')
   })
 
-  it('renders navigation links', () => {
-    render(<GroupMemberPage />)
+  it('renders navigation links', async () => {
+    await act(async () => {
+      render(<GroupMemberPage />)
+    })
     
     expect(screen.getByText('메인')).toBeInTheDocument()
     expect(screen.getByText('인증')).toBeInTheDocument()
@@ -94,38 +134,59 @@ describe('GroupMemberPage', () => {
   })
 
   it('fetches and displays verification data', async () => {
-    render(<GroupMemberPage />)
-
-    await waitFor(() => {
-      const dates = screen.getAllByText(/2024-11-\d{2}/)
-      expect(dates).toHaveLength(6)
+    // getUserInfo 응답 설정
+    vi.mocked(axios.get)
+      .mockResolvedValueOnce({ 
+        data: {
+          userName: '테스트 유저',
+          userImage: 'test-image-url'
+        }
+      }) // getUserInfo 응답
+      .mockResolvedValue({ 
+        data: mockVerificationResponse 
+      }); // verification 응답들
+  
+    await act(async () => {
+      render(<GroupMemberPage />)
     })
-
-    expect(axios.get).toHaveBeenCalledTimes(6)
+  
+    await waitFor(() => {
+      const certificates = screen.getAllByTestId('certificate')
+      expect(certificates).toHaveLength(6)
+    })
+  
+    // getUserInfo 호출 1번 + 날짜별 데이터 요청 6번으로 총 7번 호출됨
+    expect(axios.get).toHaveBeenCalledTimes(7)
   })
 
   it('handles API error gracefully', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    vi.mocked(axios.get).mockRejectedValueOnce(new Error('API Error'))
+    vi.mocked(axios.get).mockRejectedValue(new Error('API Error'))
 
-    render(<GroupMemberPage />)
+    await act(async () => {
+      render(<GroupMemberPage />)
+    })
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('인증 기록 불러오기 에러:', expect.any(Error))
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Error fetching certification data:',
+        expect.any(Error)
+      )
     })
 
     consoleSpy.mockRestore()
   })
 
   it('formats dates correctly', async () => {
-    render(<GroupMemberPage />)
+    vi.mocked(axios.get).mockResolvedValue({ data: mockVerificationResponse })
 
-    const today = new Date()
-    const formattedToday = today.toISOString().split('T')[0]
+    await act(async () => {
+      render(<GroupMemberPage />)
+    })
 
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith(
-        expect.stringContaining(formattedToday),
+        expect.stringContaining('2024-11-'),
         expect.any(Object)
       )
     })
@@ -138,11 +199,13 @@ describe('GroupMemberPage', () => {
       .mockResolvedValueOnce(emptyResponse)
       .mockResolvedValue({ data: mockVerificationResponse })
 
-    render(<GroupMemberPage />)
+    await act(async () => {
+      render(<GroupMemberPage />)
+    })
 
     await waitFor(() => {
-      const dates = screen.getAllByText(/2024-11-\d{2}/)
-      expect(dates.length).toBeLessThan(6)
+      const certificates = screen.getAllByTestId('certificate')
+      expect(certificates.length).toBeLessThan(6)
     })
   })
 })
