@@ -61,7 +61,7 @@ export default function CertificateBtn({ onUploadSuccess }) {
 
       // 성공한 이미지 URL을 부모로 전달
       if (onUploadSuccess) {
-        onUploadSuccess(data.verifications[0]?.verificationImage || null);
+        await onUploadSuccess(data.verifications[0]?.verificationImage || null);
       }
 
       // 초기화

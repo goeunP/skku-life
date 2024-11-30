@@ -68,7 +68,7 @@ export default function CertificationPage() {
     });
   };
 
-  const handleUploadSuccess = (uploadedImage) => {
+  const handleUploadSuccess = async (uploadedImage) => {
     const currentUserName = userInfo.userName;
     const updatedCertification = certification.map((day) => {
       if (day.date === todayDate) {
@@ -104,8 +104,9 @@ export default function CertificationPage() {
       headers: {
         "X-Use-Network": 'true'
       }
-  })
+    })
     setIsUploaded(true); // 업로드 성공 시 버튼 숨기기
+    return;
   };
 
   const getUserInfo = async () => {
