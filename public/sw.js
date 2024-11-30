@@ -70,15 +70,39 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    const useNetwork = request.headers.get('X-Use-Network') === 'true'; // Force network request
+
+    if (useNetwork) {
+        console.info("Removing cached data:", request.url);
+        event.respondWith(
+            caches.open(CACHE_NAME)
+            .then(cache => cache.delete(request.url))
+            .then(fetch(request))
+                .then(response => {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME)
+                        .then(cache => cache.put(request, responseClone));
+                    return response;
+                })
+                .catch(() => {
+                    console.error('Network request failed');
+                    return new Response('Network error occurred');
+                })
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(request)
             .then(cached => {
                 if (cached) {
                     // Cache hit - return cached response
+                    console.debug('Cache hit:', request.url + '. Put X-Use-Network: true in headers to force network request');
                     return cached;
                 }
                 
                 // Cache miss - fetch from network
+                console.log('Cache miss, fetching from network:', request.url);
                 return fetch(request)
                     .then(response => {
                         const responseClone = response.clone();
@@ -87,7 +111,7 @@ self.addEventListener('fetch', event => {
                         return response;
                     })
                     .catch(() => {
-                        console.log('Network request failed, no cache available');
+                        console.error('Network request failed, no cache available');
                         return new Response('Network error occurred');
                     });
             })
